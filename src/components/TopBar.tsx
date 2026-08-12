@@ -98,6 +98,14 @@ export default function TopBar() {
           </div>
         )}
       </div>
+      <NavLink to="/faq" style={navItemStyle}>
+        {({ isActive }) => (
+          <>
+            <span style={navLinkStyle({ isActive })}>FAQ</span>
+            {isActive && indicatorWidth != null && <ActiveIndicator width={indicatorWidth} />}
+          </>
+        )}
+      </NavLink>
       <a href={RESUME_URL} target="_blank" rel="noopener noreferrer" style={externalLinkStyle}>
         Resume
       </a>

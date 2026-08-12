@@ -3,6 +3,7 @@ import AppLayout from './components/AppLayout'
 import Home from './pages/Home'
 import Projects from './pages/Projects'
 import Digital from './pages/Digital'
+import FAQ from './pages/FAQ'
 export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
@@ -11,6 +12,7 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="projects" element={<Projects />} />
           <Route path="artwork/digital" element={<Digital />} />
+          <Route path="faq" element={<FAQ />} />
         </Route>
       </Routes>
     </BrowserRouter>
