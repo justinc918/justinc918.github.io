@@ -58,7 +58,7 @@ export default function Home() {
           </div>
         </div>
         <div style={rightColumnStyle}>
-          <h1 style={nameStyle}>Justin Chen</h1>
+          <h1 style={nameStyle}>Hi, I'm Justin Chen</h1>
           <p style={descriptionStyle}>{LOREM}</p>
         </div>
       </div>
