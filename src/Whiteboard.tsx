@@ -22,7 +22,7 @@ const MAX_SCALE = 8
 const CARD_WIDTH = 280
 
 const INITIAL_TRANSFORM: Transform = { x: 0, y: 0, scale: 1 }
-const TEXTURE_SRC = `${import.meta.env.BASE_URL}images/whiteboard.png`
+const TEXTURE_SRC = `${import.meta.env.BASE_URL}images/common/whiteboard.png`
 const TEXTURE_TILE = 512
 
 export default function Whiteboard({ images }: Props) {

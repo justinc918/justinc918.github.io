@@ -20,7 +20,7 @@ const layoutStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
   backgroundColor: 'rgb(20, 24, 39)',
-  backgroundImage: `url(${BASE}images/background.png)`,
+  backgroundImage: `url(${BASE}images/common/background.png)`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
