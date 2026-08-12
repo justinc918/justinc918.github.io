@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 
 const BASE = import.meta.env.BASE_URL
 const RESUME_URL = `${BASE}files/JustinChenResumeF.pdf`
+const SMALL_HORIZ = `${BASE}images/common/small_horiz.svg`
 
 const navLinkStyle = ({ isActive }: { isActive: boolean }): React.CSSProperties => ({
   color: isActive ? '#c4d3ff' : 'rgba(196,211,255,0.75)',
@@ -11,6 +12,17 @@ const navLinkStyle = ({ isActive }: { isActive: boolean }): React.CSSProperties 
   letterSpacing: '0.03em',
   fontWeight: isActive ? 500 : 400,
 })
+
+function ActiveIndicator({ width }: { width: number }) {
+  return (
+    <img
+      src={SMALL_HORIZ}
+      alt=""
+      aria-hidden="true"
+      style={{ ...activeIndicatorStyle, width }}
+    />
+  )
+}
 
 const externalLinkStyle: React.CSSProperties = {
   color: 'rgba(196,211,255,0.75)',
@@ -22,21 +34,42 @@ const externalLinkStyle: React.CSSProperties = {
 export default function TopBar() {
   const [artworkOpen, setArtworkOpen] = useState(false)
   const artworkActive = useLocation().pathname.startsWith('/artwork')
+  const artworkLabelRef = useRef<HTMLSpanElement>(null)
+  const [indicatorWidth, setIndicatorWidth] = useState<number>()
+
+  useLayoutEffect(() => {
+    const el = artworkLabelRef.current
+    if (!el) return
+    setIndicatorWidth(el.offsetWidth)
+  }, [])
 
   return (
     <nav style={barStyle}>
-      <NavLink to="/" style={navLinkStyle} end>
-        About
+      <NavLink to="/" style={navItemStyle} end>
+        {({ isActive }) => (
+          <>
+            <span style={navLinkStyle({ isActive })}>About</span>
+            {isActive && indicatorWidth != null && <ActiveIndicator width={indicatorWidth} />}
+          </>
+        )}
       </NavLink>
-      <NavLink to="/projects" style={navLinkStyle}>
-        Projects
+      <NavLink to="/projects" style={navItemStyle}>
+        {({ isActive }) => (
+          <>
+            <span style={navLinkStyle({ isActive })}>Projects</span>
+            {isActive && indicatorWidth != null && <ActiveIndicator width={indicatorWidth} />}
+          </>
+        )}
       </NavLink>
       <div
-        style={{ position: 'relative' }}
+        style={navItemStyle}
         onMouseEnter={() => setArtworkOpen(true)}
         onMouseLeave={() => setArtworkOpen(false)}
       >
-        <span style={{ ...artworkLabelStyle, color: artworkActive ? '#c4d3ff' : artworkLabelStyle.color, fontWeight: artworkActive ? 500 : 400 }}>
+        <span
+          ref={artworkLabelRef}
+          style={{ ...artworkLabelStyle, color: artworkActive ? '#c4d3ff' : artworkLabelStyle.color, fontWeight: artworkActive ? 500 : 400 }}
+        >
           Artwork
           <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true" style={artworkArrowStyle}>
             <path
@@ -49,6 +82,7 @@ export default function TopBar() {
             />
           </svg>
         </span>
+        {artworkActive && indicatorWidth != null && <ActiveIndicator width={indicatorWidth} />}
         {artworkOpen && (
           <div style={dropdownStyle}>
             <NavLink
@@ -69,6 +103,24 @@ export default function TopBar() {
       </a>
     </nav>
   )
+}
+
+const navItemStyle: React.CSSProperties = {
+  position: 'relative',
+  display: 'inline-flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textDecoration: 'none',
+}
+
+const activeIndicatorStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '100%',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  height: 'auto',
+  marginTop: 4,
+  pointerEvents: 'none',
 }
 
 const barStyle: React.CSSProperties = {
