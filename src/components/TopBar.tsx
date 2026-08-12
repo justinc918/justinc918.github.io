@@ -131,6 +131,7 @@ const barStyle: React.CSSProperties = {
   padding: '14px 28px',
   background: 'transparent',
   flexShrink: 0,
+  position: 'relative',
   zIndex: 200,
   textTransform: 'uppercase',
 }
