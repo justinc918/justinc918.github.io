@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 
 const BASE = import.meta.env.BASE_URL
@@ -13,17 +13,6 @@ const navLinkStyle = ({ isActive }: { isActive: boolean }): React.CSSProperties 
   fontWeight: isActive ? 500 : 400,
 })
 
-function ActiveIndicator({ width }: { width: number }) {
-  return (
-    <img
-      src={SMALL_HORIZ}
-      alt=""
-      aria-hidden="true"
-      style={{ ...activeIndicatorStyle, width }}
-    />
-  )
-}
-
 const externalLinkStyle: React.CSSProperties = {
   color: 'rgba(196,211,255,0.75)',
   textDecoration: 'none',
@@ -31,43 +20,99 @@ const externalLinkStyle: React.CSSProperties = {
   letterSpacing: '0.03em',
 }
 
+type Indicator = { left: number; width: number; top: number; visible: boolean }
+
 export default function TopBar() {
   const [artworkOpen, setArtworkOpen] = useState(false)
-  const artworkActive = useLocation().pathname.startsWith('/artwork')
-  const artworkLabelRef = useRef<HTMLSpanElement>(null)
-  const [indicatorWidth, setIndicatorWidth] = useState<number>()
+  const pathname = useLocation().pathname
+  const artworkActive = pathname.startsWith('/artwork')
 
-  useLayoutEffect(() => {
-    const el = artworkLabelRef.current
-    if (!el) return
-    setIndicatorWidth(el.offsetWidth)
+  const navRef = useRef<HTMLElement>(null)
+  const itemRefs = useRef<(HTMLElement | null)[]>([])
+  const [indicator, setIndicator] = useState<Indicator>({ left: 0, width: 0, top: 0, visible: false })
+
+  // Index of the nav item that matches the current route (the "resting" position).
+  const activeIndex =
+    pathname === '/' ? 0
+    : pathname.startsWith('/projects') ? 1
+    : artworkActive ? 2
+    : pathname.startsWith('/faq') ? 3
+    : -1
+
+  const moveTo = useCallback((index: number) => {
+    const nav = navRef.current
+    const el = index >= 0 ? itemRefs.current[index] : null
+    if (!nav || !el) {
+      setIndicator((prev) => ({ ...prev, visible: false }))
+      return
+    }
+    const navRect = nav.getBoundingClientRect()
+    const rect = el.getBoundingClientRect()
+    setIndicator({
+      left: rect.left - navRect.left,
+      width: rect.width,
+      top: rect.bottom - navRect.top + 4,
+      visible: true,
+    })
   }, [])
 
+  // Rest under the active route item; re-measure on route change / resize.
+  useLayoutEffect(() => {
+    moveTo(activeIndex)
+    const onResize = () => moveTo(activeIndex)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [activeIndex, moveTo])
+
+  const setItemRef = (index: number) => (el: HTMLElement | null) => {
+    itemRefs.current[index] = el
+  }
+
   return (
-    <nav style={barStyle}>
-      <NavLink to="/" style={navItemStyle} end>
-        {({ isActive }) => (
-          <>
-            <span style={navLinkStyle({ isActive })}>About</span>
-            {isActive && indicatorWidth != null && <ActiveIndicator width={indicatorWidth} />}
-          </>
-        )}
+    <nav
+      ref={navRef}
+      style={barStyle}
+      onMouseLeave={() => moveTo(activeIndex)}
+    >
+      <img
+        src={SMALL_HORIZ}
+        alt=""
+        aria-hidden="true"
+        style={{
+          ...indicatorStyle,
+          width: indicator.width,
+          transform: `translateX(${indicator.left}px)`,
+          top: indicator.top,
+          opacity: indicator.visible ? 1 : 0,
+        }}
+      />
+      <NavLink
+        to="/"
+        end
+        ref={setItemRef(0)}
+        style={navItemStyle}
+        onMouseEnter={() => moveTo(0)}
+      >
+        {({ isActive }) => <span style={navLinkStyle({ isActive })}>About</span>}
       </NavLink>
-      <NavLink to="/projects" style={navItemStyle}>
-        {({ isActive }) => (
-          <>
-            <span style={navLinkStyle({ isActive })}>Projects</span>
-            {isActive && indicatorWidth != null && <ActiveIndicator width={indicatorWidth} />}
-          </>
-        )}
+      <NavLink
+        to="/projects"
+        ref={setItemRef(1)}
+        style={navItemStyle}
+        onMouseEnter={() => moveTo(1)}
+      >
+        {({ isActive }) => <span style={navLinkStyle({ isActive })}>Projects</span>}
       </NavLink>
       <div
+        ref={setItemRef(2)}
         style={navItemStyle}
-        onMouseEnter={() => setArtworkOpen(true)}
+        onMouseEnter={() => {
+          setArtworkOpen(true)
+          moveTo(2)
+        }}
         onMouseLeave={() => setArtworkOpen(false)}
       >
         <span
-          ref={artworkLabelRef}
           style={{ ...artworkLabelStyle, color: artworkActive ? '#c4d3ff' : artworkLabelStyle.color, fontWeight: artworkActive ? 500 : 400 }}
         >
           Artwork
@@ -82,7 +127,6 @@ export default function TopBar() {
             />
           </svg>
         </span>
-        {artworkActive && indicatorWidth != null && <ActiveIndicator width={indicatorWidth} />}
         {artworkOpen && (
           <div style={dropdownStyle}>
             <NavLink
@@ -98,15 +142,22 @@ export default function TopBar() {
           </div>
         )}
       </div>
-      <NavLink to="/faq" style={navItemStyle}>
-        {({ isActive }) => (
-          <>
-            <span style={navLinkStyle({ isActive })}>FAQ</span>
-            {isActive && indicatorWidth != null && <ActiveIndicator width={indicatorWidth} />}
-          </>
-        )}
+      <NavLink
+        to="/faq"
+        ref={setItemRef(3)}
+        style={navItemStyle}
+        onMouseEnter={() => moveTo(3)}
+      >
+        {({ isActive }) => <span style={navLinkStyle({ isActive })}>FAQ</span>}
       </NavLink>
-      <a href={RESUME_URL} target="_blank" rel="noopener noreferrer" style={externalLinkStyle}>
+      <a
+        href={RESUME_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        ref={setItemRef(4)}
+        style={{ ...navItemStyle, ...externalLinkStyle }}
+        onMouseEnter={() => moveTo(4)}
+      >
         Resume
       </a>
     </nav>
@@ -121,14 +172,13 @@ const navItemStyle: React.CSSProperties = {
   textDecoration: 'none',
 }
 
-const activeIndicatorStyle: React.CSSProperties = {
+const indicatorStyle: React.CSSProperties = {
   position: 'absolute',
-  top: '100%',
-  left: '50%',
-  transform: 'translateX(-50%)',
+  left: 0,
   height: 'auto',
-  marginTop: 4,
   pointerEvents: 'none',
+  transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease',
+  willChange: 'transform, width',
 }
 
 const barStyle: React.CSSProperties = {
