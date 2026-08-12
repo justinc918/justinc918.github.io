@@ -132,8 +132,8 @@ const linkStyle: React.CSSProperties = {
 
 const dividerStyle: React.CSSProperties = {
   alignSelf: 'stretch',
-  width: 16,
-  height: 'auto',
+  width: 4,
+  minHeight: 0,
   objectFit: 'fill',
   flexShrink: 0,
   opacity: 0.5,
