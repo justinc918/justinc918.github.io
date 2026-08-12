@@ -58,13 +58,9 @@ export default function TopBar() {
             >
               Digital
             </NavLink>
-            <NavLink
-              to="/artwork/whiteboard"
-              style={navLinkStyle}
-              onClick={() => setArtworkOpen(false)}
-            >
-              Whiteboard
-            </NavLink>
+            <span style={disabledNavItemStyle}>
+              Whiteboard (WIP)
+            </span>
           </div>
         )}
       </div>
@@ -100,6 +96,13 @@ const artworkLabelStyle: React.CSSProperties = {
 const artworkArrowStyle: React.CSSProperties = {
   flexShrink: 0,
   marginTop: 2,
+}
+
+const disabledNavItemStyle: React.CSSProperties = {
+  color: 'rgba(196,211,255,0.4)',
+  fontSize: 18,
+  letterSpacing: '0.03em',
+  cursor: 'default',
 }
 
 const dropdownStyle: React.CSSProperties = {
