@@ -5,7 +5,7 @@ const QA_ITEMS = [
   },
   {
     question: 'Is anything AI generated?',
-    answer: 'Well, I use AI for assistance while coding (mostly Cursor). That\'s pretty standard nowadays. However, I have not used AI to create any of the art pieces here.',
+    answer: 'If we\'re talking the stuff I drew, I have not used AI to create anything under Artworks.',
   }
 ]
 
@@ -44,7 +44,7 @@ const contentStyle: React.CSSProperties = {
 }
 
 const titleStyle: React.CSSProperties = {
-  color: '#c4d3ff',
+  color: '#ffffff',
   fontSize: 28,
   fontWeight: 500,
   letterSpacing: '0.08em',
@@ -64,7 +64,7 @@ const itemStyle: React.CSSProperties = {
 }
 
 const questionStyle: React.CSSProperties = {
-  color: '#c4d3ff',
+  color: '#ffffff',
   fontSize: 18,
   fontWeight: 500,
   letterSpacing: '0.02em',
@@ -72,7 +72,7 @@ const questionStyle: React.CSSProperties = {
 }
 
 const answerStyle: React.CSSProperties = {
-  color: 'rgba(196,211,255,0.75)',
+  color: '#c4d3ff',
   fontSize: 16,
   lineHeight: 1.6,
   margin: 0,

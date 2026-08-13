@@ -37,9 +37,9 @@ type Project = {
 }
 
 const PROJECTS: Project[] = [
-  { title: 'Canary', description: LOREM, href: 'https://github.com/arnav0202006/Canary' },
-  { title: 'Argion', description: LOREM, href: 'https://github.com/justinc918/Argion' },
-  { title: '35L Project', description: LOREM, href: 'https://github.com/lordboba/35Lproject', liveHref: 'https://35-lproject.vercel.app/app/lobby', hasImage: true },
+  { title: 'Canary', description: 'Canary is a tool that lets users track their AI agent\'s development and roll back to previous versions in case of behavior issues. So in a nutshell, version control for agents. Made for LAHacks 2026.', href: 'https://github.com/arnav0202006/Canary' },
+  { title: 'Argion', description: 'Argion is an all-in-one app for monitoring asteroids. Included are AI-driven classifications for asteroid severity and the best ways for astronomers to observe them, including locations and telescope settings. We also included some fun features like how you could theoretically travel to other planets by shooting off asteroids. Made for Berkeley AI Hackathon 2026.', href: 'https://github.com/justinc918/Argion' },
+  { title: '35L Project', description: 'Our team project for the infamous UCLA CS 35L course. We built ', href: 'https://github.com/lordboba/35Lproject', liveHref: 'https://35-lproject.vercel.app/app/lobby', hasImage: true },
 ]
 
 export default function Projects() {
