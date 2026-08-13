@@ -26,6 +26,30 @@ const EVENTS: TimelineEvent[] = [
     title: 'Latest Piece',
     description: 'Placeholder entry. Newest, at the far right.',
   },
+  {
+    id: 'placeholder-5',
+    date: '',
+    title: '',
+    description: '',
+  },
+  {
+    id: 'placeholder-6',
+    date: '',
+    title: '',
+    description: '',
+  },
+  {
+    id: 'placeholder-7',
+    date: '',
+    title: '',
+    description: '',
+  },
+  {
+    id: 'placeholder-8',
+    date: '',
+    title: '',
+    description: '',
+  },
 ]
 
 export default function Digital() {

@@ -47,9 +47,12 @@ const FAINT = 'rgba(196,211,255,0.4)'
 
 const COLUMN_WIDTH = 320
 const LANE_HEIGHT = 260 // vertical space reserved for a box on one side of the line
-const CONNECTOR_LENGTH = 48
+const CONNECTOR_UP = 26 // top images sit closer to the line
+const CONNECTOR_DOWN = 96 // bottom images sit ~2x farther from the line
 const POINT_SIZE = 22
 const BOX_RATIO = 4 / 3
+const CAPTION_WIDTH = 190 // caption sits to the left of the image
+const START_PADDING = 240 // extra room so the first piece's caption fits
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Timeline
@@ -233,6 +236,13 @@ function TimelineBox({ event, frame }: { event: TimelineEvent; frame?: string })
       onBlur={() => setHovered(false)}
       tabIndex={0}
     >
+      {/* Caption sits to the left of the image and fades in on hover. It is
+          absolutely positioned so it never shifts the image layout. */}
+      <figcaption style={boxCaptionStyle(hovered)}>
+        <span style={boxDateStyle}>{event.date}</span>
+        <span style={boxTitleStyle}>{event.title}</span>
+        {event.description && <span style={boxDescriptionStyle}>{event.description}</span>}
+      </figcaption>
       <div style={boxMediaStyle(hovered)}>
         {/* Border art: uses the custom frame when supplied, otherwise a plain
             rectangle placeholder. Expands slightly outward on hover. */}
@@ -249,11 +259,6 @@ function TimelineBox({ event, frame }: { event: TimelineEvent; frame?: string })
           </div>
         )}
       </div>
-      <figcaption style={boxCaptionStyle(hovered)}>
-        <span style={boxDateStyle}>{event.date}</span>
-        <span style={boxTitleStyle}>{event.title}</span>
-        {event.description && <span style={boxDescriptionStyle}>{event.description}</span>}
-      </figcaption>
     </figure>
   )
 }
@@ -277,7 +282,7 @@ const trackStyle: React.CSSProperties = {
   alignItems: 'center',
   minWidth: 'min-content',
   margin: 'auto',
-  padding: '0 64px',
+  padding: `0 64px 0 ${START_PADDING}px`,
 }
 
 const columnStyle: React.CSSProperties = {
@@ -383,7 +388,7 @@ const pointPlaceholderStyle: React.CSSProperties = {
 
 const connectorWrapStyle = (orientation: 'up' | 'down'): React.CSSProperties => ({
   width: 12,
-  height: CONNECTOR_LENGTH,
+  height: orientation === 'up' ? CONNECTOR_UP : CONNECTOR_DOWN,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -405,11 +410,10 @@ const connectorPlaceholderStyle: React.CSSProperties = {
 // Box
 
 const boxStyle: React.CSSProperties = {
+  position: 'relative',
   margin: 0,
   width: COLUMN_WIDTH - 64,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 10,
+  outline: 'none',
 }
 
 const boxMediaStyle = (hovered: boolean): React.CSSProperties => ({
@@ -467,11 +471,20 @@ const boxPlaceholderLabelStyle: React.CSSProperties = {
 }
 
 const boxCaptionStyle = (hovered: boolean): React.CSSProperties => ({
+  position: 'absolute',
+  top: 0,
+  right: '100%',
+  height: '100%',
+  width: CAPTION_WIDTH,
+  marginRight: 34,
   display: 'flex',
   flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'flex-end',
+  textAlign: 'right',
   gap: 4,
   opacity: hovered ? 1 : 0,
-  transform: hovered ? 'translateY(0)' : 'translateY(-6px)',
+  transform: hovered ? 'translateX(0)' : 'translateX(8px)',
   transition: 'opacity 220ms ease, transform 220ms ease',
   pointerEvents: hovered ? 'auto' : 'none',
 })
