@@ -423,6 +423,9 @@ const boxMediaStyle = (hovered: boolean): React.CSSProperties => ({
   transform: hovered ? 'scale(1.05)' : 'scale(1)',
   transition: 'transform 220ms ease',
   transformOrigin: 'center',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 })
 
 const boxFrameStyle = (hovered: boolean): React.CSSProperties => ({
@@ -446,11 +449,13 @@ const boxBorderPlaceholderStyle = (hovered: boolean): React.CSSProperties => ({
   transition: 'inset 220ms ease, border-color 220ms ease',
 })
 
+// Match the box height and preserve the image's native proportions; width
+// scales automatically so nothing gets cropped or stretched.
 const boxImageStyle: React.CSSProperties = {
   display: 'block',
-  width: '100%',
   height: '100%',
-  objectFit: 'cover',
+  width: 'auto',
+  objectFit: 'contain',
   borderRadius: 4,
 }
 

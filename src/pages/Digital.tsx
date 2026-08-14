@@ -1,61 +1,100 @@
 import ArtworkTimeline, { type TimelineEvent } from '../components/timeline/ArtworkTimeline'
 
+const BASE = import.meta.env.BASE_URL
+const CREDITS = 'Artwork by Justin Chen.'
+
 // Oldest first (left). Newest goes on the right as entries are appended.
 const EVENTS: TimelineEvent[] = [
   {
-    id: 'placeholder-1',
-    date: '2023',
-    title: 'First Piece',
-    description: 'Placeholder entry. Replace with the earliest artwork.',
-  },
-  {
-    id: 'placeholder-2',
-    date: '2024',
-    title: 'Second Piece',
-    description: 'Placeholder entry. Alternates below the line.',
-  },
-  {
-    id: 'placeholder-3',
-    date: '2025',
-    title: 'Third Piece',
-    description: 'Placeholder entry. Back above the line.',
-  },
-  {
-    id: 'placeholder-4',
-    date: '2026',
-    title: 'Latest Piece',
-    description: 'Placeholder entry. Newest, at the far right.',
-  },
-  {
-    id: 'placeholder-5',
+    id: 'halfmoonbay',
     date: '',
-    title: '',
-    description: '',
+    title: 'Half Moon Bay',
+    imageSrc: `${BASE}images/digital/halfmoonbay.webp`,
+    imageAlt: 'Half Moon Bay',
   },
   {
-    id: 'placeholder-6',
+    id: 'first_color',
     date: '',
-    title: '',
-    description: '',
+    title: 'First Color',
+    imageSrc: `${BASE}images/digital/first_color.webp`,
+    imageAlt: 'First Color',
   },
   {
-    id: 'placeholder-7',
+    id: 'asdfja',
     date: '',
-    title: '',
-    description: '',
+    title: 'Asdfja',
+    imageSrc: `${BASE}images/digital/asdfja.webp`,
+    imageAlt: 'Asdfja',
   },
   {
-    id: 'placeholder-8',
+    id: 'selfp1',
     date: '',
-    title: '',
-    description: '',
+    title: 'Self Portrait',
+    imageSrc: `${BASE}images/digital/selfp1.webp`,
+    imageAlt: 'Self Portrait',
+  },
+  {
+    id: 'nightfarers',
+    date: '',
+    title: 'Nightfarers',
+    imageSrc: `${BASE}images/digital/nightfarers.webp`,
+    imageAlt: 'Nightfarers',
+  },
+  {
+    id: 'faithchar_color',
+    date: '',
+    title: 'Faith',
+    imageSrc: `${BASE}images/digital/faithchar_color.webp`,
+    imageAlt: 'Faith',
+  },
+  {
+    id: 'strengthchar_color',
+    date: '',
+    title: 'Strength',
+    imageSrc: `${BASE}images/digital/strengthchar_color.webp`,
+    imageAlt: 'Strength',
+  },
+  {
+    id: 'harmonia_study',
+    date: '',
+    title: 'Harmonia Study',
+    imageSrc: `${BASE}images/digital/Harmonia_study.webp`,
+    imageAlt: 'Harmonia Study',
+  },
+  {
+    id: 'jjk',
+    date: '',
+    title: 'JJK',
+    imageSrc: `${BASE}images/digital/jjk.webp`,
+    imageAlt: 'JJK',
+  },
+  {
+    id: 'caving',
+    date: '',
+    title: 'Caving',
+    imageSrc: `${BASE}images/digital/caving.webp`,
+    imageAlt: 'Caving',
+  },
+  {
+    id: 'artfight1',
+    date: '',
+    title: 'Art Fight',
+    imageSrc: `${BASE}images/digital/artfight1.webp`,
+    imageAlt: 'Art Fight',
   },
 ]
 
 export default function Digital() {
   return (
     <div style={pageStyle}>
-      <ArtworkTimeline events={EVENTS} />
+      <div style={timelineStyle}>
+        <ArtworkTimeline events={EVENTS} />
+      </div>
+      <div style={creditsBoxStyle}>
+        <p style={creditsTextStyle}>
+          <strong style={creditsLabelStyle}>Credits</strong> {CREDITS}
+        </p>
+      </div>
     </div>
   )
 }
@@ -63,4 +102,35 @@ export default function Digital() {
 const pageStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
+}
+
+const timelineStyle: React.CSSProperties = {
+  flex: 1,
+  minHeight: 0,
+}
+
+const creditsBoxStyle: React.CSSProperties = {
+  flex: '0 0 auto',
+  margin: '0 40px 24px',
+  padding: '12px 16px',
+  overflowX: 'auto',
+  overflowY: 'hidden',
+  borderRadius: 4,
+  backgroundColor: 'rgba(20, 24, 39, 0.45)',
+}
+
+const creditsTextStyle: React.CSSProperties = {
+  width: 'max-content',
+  color: 'rgba(255, 255, 255, 0.78)',
+  fontSize: 15,
+  lineHeight: 1.4,
+  whiteSpace: 'nowrap',
+}
+
+const creditsLabelStyle: React.CSSProperties = {
+  color: '#fff',
+  fontWeight: 700,
 }

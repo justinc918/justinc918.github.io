@@ -1,11 +1,20 @@
 const QA_ITEMS = [
   {
-    question: 'What tools do you use for your artwork?',
-    answer: 'Procreate to sketch and draw in mostly everything, and Photoshop for tuning colors and special effects.',
+    question: 'UCLA course recommendations?',
+    answer: 'Both EC ENGR C147a (Deep Learning) and its sequel, C147b (Deep Learning II). The hype is real, but good luck getting into it lol (SUBMIT AN ECR!!). Com Sci M146 was also pretty good. For a lesser known course, EC ENGR 133a (Applied Numerical Computing) with Vandenberghe is also a cool, albeit pretty tough class. For this last one, it might just be me, but ART HIS 21 was fun.',
+  },
+  {
+    question: 'What do you draw with?',
+    answer: 'Procreate to sketch and draw in mostly everything, and Photoshop for tuning colors and special effects. I do a lot of my practice with fineliners, a holdover from Drawabox.',
   },
   {
     question: 'Is anything AI generated?',
-    answer: 'If we\'re talking the stuff I drew, I have not used AI to create anything under Artworks.',
+    answer: 'If we\'re talking the stuff I drew, I have not used AI to create anything under Artworks. I also hand-made all the assets used on this website.',
+  }
+  ,
+  {
+    question: 'Get a haircut.',
+    answer: 'Not a question. It happens when I feel like it.',
   }
 ]
 

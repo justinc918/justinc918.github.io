@@ -62,8 +62,16 @@ export default function Home() {
         </div>
         <img src={VERTICAL} alt="" aria-hidden="true" style={dividerStyle} />
         <div style={rightColumnStyle}>
-          <h1 style={nameStyle}>Hi, I'm Justin Chen</h1>
-          <p style={descriptionStyle}>{LOREM}</p>
+          <h1 style={nameStyle}>Hi, I'm Justin</h1>
+          <p style={descriptionStyle}>
+  I'm currently a rising junior at UCLA studying Computer Science, with a focus on machine learning and NLP. I am also a Kleiner Perkins Engineering Fellow and an officer for ACM ICPC at UCLA.
+  <br />
+  <br />
+    Outside of my studies and coding up weird things, I enjoy going to the gym and cooking. I also like drawing and painting digitally as a hobby; check out the Artwork page for my creations.
+    <br />
+    <br />
+    They also call me Jchen, JCProject, noobstin, a menace, and "dude this guy".
+</p>
         </div>
       </div>
     </div>
