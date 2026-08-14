@@ -1,7 +1,14 @@
-import ArtworkTimeline, { type TimelineEvent } from '../components/timeline/ArtworkTimeline'
+import ArtworkTimeline, { CreditHighlight as Hi, type TimelineEvent } from '../components/timeline/ArtworkTimeline'
 
 const BASE = import.meta.env.BASE_URL
-const CREDITS = 'Drawabox (https://drawabox.com): Where I first learned to draw. Proko (www.proko.com): Figure drawing and one-off tutorials and inspiration. Jeremy Fenske (https://www.artstation.com/jandrew): Thanks for the brushes. FromSoftware (https://www.fromsoftware.jp): One of my biggest sources of inspiration, and where some of my own characters originated. Finally, the friends I sent my drawings to.'
+const CREDITS = (
+  <>
+    <Hi>Drawabox (https://drawabox.com):</Hi> Where I first learned to draw.{' '}
+    <Hi>Proko (www.proko.com):</Hi> Figure drawing and one-off tutorials and inspiration.{' '}
+    <Hi>Jeremy Fenske (https://www.artstation.com/jandrew):</Hi> Thanks for the brushes.{' '}
+    <Hi>FromSoftware (https://www.fromsoftware.jp):</Hi> One of my biggest sources of inspiration, and where some of my own characters originated. Finally, the friends I sent my drawings to.
+  </>
+)
 
 // Oldest first (left). Newest goes on the right as entries are appended.
 const EVENTS: TimelineEvent[] = [

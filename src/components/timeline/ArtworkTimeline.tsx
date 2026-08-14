@@ -336,6 +336,12 @@ const creditsLabelStyle: React.CSSProperties = {
   fontWeight: 700,
 }
 
+// Wrap important words inside `credits` with this to make them stand out in the
+// brighter accent blue, while surrounding text stays the muted blue.
+export function CreditHighlight({ children }: { children: React.ReactNode }) {
+  return <span style={{ color: ACCENT }}>{children}</span>
+}
+
 const columnStyle: React.CSSProperties = {
   flex: '0 0 auto',
   width: COLUMN_WIDTH,

@@ -1,5 +1,6 @@
 const BASE = import.meta.env.BASE_URL
 const VERTICAL = `${BASE}images/common/vertical.svg`
+const ME = `${BASE}images/other/me.png`
 
 const LOREM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
@@ -42,9 +43,7 @@ export default function Home() {
     <div style={pageStyle}>
       <div style={contentStyle}>
         <div style={leftColumnStyle}>
-          <div style={imagePlaceholderStyle}>
-            <span style={imagePlaceholderLabelStyle}>Add image here</span>
-          </div>
+          <img src={ME} alt="Justin" style={profileImageStyle} />
           <div style={linksStyle}>
             {LINKS.map((link) => (
               <a
@@ -105,21 +104,12 @@ const leftColumnStyle: React.CSSProperties = {
   gap: 24,
 }
 
-const imagePlaceholderStyle: React.CSSProperties = {
+const profileImageStyle: React.CSSProperties = {
   width: '100%',
-  height: 360,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  border: '1px dashed rgba(196,211,255,0.4)',
+  height: 'auto',
+  objectFit: 'contain',
   borderRadius: 4,
-  backgroundColor: 'rgba(196,211,255,0.04)',
-}
-
-const imagePlaceholderLabelStyle: React.CSSProperties = {
-  color: 'rgba(196,211,255,0.5)',
-  fontSize: 14,
-  letterSpacing: '0.03em',
+  display: 'block',
 }
 
 const linksStyle: React.CSSProperties = {
