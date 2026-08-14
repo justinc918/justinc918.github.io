@@ -13,6 +13,27 @@ export type TimelineEvent = {
   description?: string
 }
 
+// A 9-slice border: the source image is cut into 4 fixed corners, 4 stretchable
+// (or tileable) edges, and a discarded center. Corners keep their pixel size at
+// any box dimension; only the straight edges scale. This is how the frame is
+// made to hug the image no matter its aspect ratio.
+export type TimelineBoxBorder = {
+  /** Frame image whose four corners stay fixed and whose edges stretch/tile. */
+  src: string
+  /**
+   * Distance (in SOURCE-image px) from each edge inward to where the corner
+   * ends. A single number applies to all four sides; pass
+   * [top, right, bottom, left] for asymmetric art.
+   */
+  slice: number | [number, number, number, number]
+  /** On-screen thickness of the border. Defaults to `slice` (single-number form). */
+  width?: number
+  /** How the straight edge slices fill the gap between corners. */
+  repeat?: 'stretch' | 'repeat' | 'round'
+  /** How far (px) the frame sits outside the image edge. Defaults to 0. */
+  outset?: number
+}
+
 // Asset slots are grouped by type so each visual layer can be swapped for a
 // custom SVG later without touching layout logic. Any slot left undefined falls
 // back to a CSS placeholder.
@@ -27,6 +48,9 @@ export type TimelineAssets = {
     marker?: string
   }
   box?: {
+    /** 9-slice frame that dynamically hugs the image. Preferred. */
+    border?: TimelineBoxBorder
+    /** Legacy single-image frame stretched over the image bounds. */
     frame?: string
   }
 }
@@ -127,7 +151,7 @@ function TimelineColumn({ event, above, isFirst, isLast, assets }: ColumnProps) 
       <div style={{ ...laneStyle('up'), ...shiftStyle }}>
         {above && (
           <>
-            <TimelineBox event={event} frame={assets?.box?.frame} />
+            <TimelineBox event={event} box={assets?.box} />
             <TimelineConnector asset={assets?.line?.connector} orientation="up" />
           </>
         )}
@@ -154,7 +178,7 @@ function TimelineColumn({ event, above, isFirst, isLast, assets }: ColumnProps) 
         {!above && (
           <>
             <TimelineConnector asset={assets?.line?.connector} orientation="down" />
-            <TimelineBox event={event} frame={assets?.box?.frame} />
+            <TimelineBox event={event} box={assets?.box} />
           </>
         )}
       </div>
@@ -246,8 +270,10 @@ function TimelineConnector({
 // Box module (artwork card)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function TimelineBox({ event, frame }: { event: TimelineEvent; frame?: string }) {
+function TimelineBox({ event, box }: { event: TimelineEvent; box?: TimelineAssets['box'] }) {
   const [hovered, setHovered] = useState(false)
+  const border = box?.border
+  const frame = box?.frame
 
   return (
     <figure
@@ -267,20 +293,21 @@ function TimelineBox({ event, frame }: { event: TimelineEvent; frame?: string })
         {event.description && <span style={boxDescriptionStyle}>{event.description}</span>}
       </figcaption>
       <div style={boxMediaStyle(hovered)}>
-        {/* Border art: uses the custom frame when supplied, otherwise a plain
-            rectangle placeholder. Expands slightly outward on hover. */}
-        {frame ? (
-          <img src={frame} alt="" aria-hidden="true" style={boxFrameStyle(hovered)} />
-        ) : (
-          <div style={boxBorderPlaceholderStyle(hovered)} />
-        )}
-        {event.imageSrc ? (
-          <img src={event.imageSrc} alt={event.imageAlt ?? event.title} style={boxImageStyle} />
-        ) : (
-          <div style={boxImagePlaceholderStyle}>
-            <span style={boxPlaceholderLabelStyle}>Add image here</span>
-          </div>
-        )}
+        {/* The frame wrapper shrink-wraps to the image's real rendered size, so
+            whatever border it carries hugs the picture rather than the 4:3
+            media box. Border priority: 9-slice > legacy frame > placeholder. */}
+        <div style={frameWrapStyle(hovered, border)}>
+          {frame && !border && (
+            <img src={frame} alt="" aria-hidden="true" style={legacyFrameStyle} />
+          )}
+          {event.imageSrc ? (
+            <img src={event.imageSrc} alt={event.imageAlt ?? event.title} style={boxImageStyle} />
+          ) : (
+            <div style={boxImagePlaceholderStyle}>
+              <span style={boxPlaceholderLabelStyle}>Add image here</span>
+            </div>
+          )}
+        </div>
       </div>
     </figure>
   )
@@ -485,26 +512,56 @@ const boxMediaStyle = (hovered: boolean): React.CSSProperties => ({
   justifyContent: 'center',
 })
 
-const boxFrameStyle = (hovered: boolean): React.CSSProperties => ({
-  position: 'absolute',
-  inset: hovered ? -8 : 0,
-  width: 'auto',
-  height: 'auto',
-  pointerEvents: 'none',
-  zIndex: 1,
-  transition: 'inset 220ms ease',
-})
+// Shrink-wraps the image (image is height:100% / width:auto, so the wrapper
+// takes the image's exact rendered box) and carries the border. This is what
+// makes the frame track each image's real dimensions.
+//   - 9-slice border  -> border-image (fixed corners, stretchable edges)
+//   - no border art    -> a thin placeholder rectangle
+// The border is drawn OUTSIDE the content (content-box), so the image still
+// fills the full box height while the frame sits around it.
+const frameWrapStyle = (
+  hovered: boolean,
+  border?: TimelineBoxBorder,
+): React.CSSProperties => {
+  const base: React.CSSProperties = {
+    position: 'relative',
+    height: '100%',
+    boxSizing: 'content-box',
+    borderRadius: 4,
+    transition: 'border-color 220ms ease',
+  }
 
-// Placeholder rectangle border, stands in for the frame art the user adds later.
-const boxBorderPlaceholderStyle = (hovered: boolean): React.CSSProperties => ({
+  if (border) {
+    const sliceValue = Array.isArray(border.slice) ? border.slice.join(' ') : `${border.slice}`
+    const width = border.width ?? (Array.isArray(border.slice) ? border.slice[0] : border.slice)
+    return {
+      ...base,
+      borderStyle: 'solid',
+      borderWidth: width,
+      borderImageSource: `url(${border.src})`,
+      borderImageSlice: sliceValue,
+      borderImageWidth: `${width}px`,
+      borderImageRepeat: border.repeat ?? 'stretch',
+      borderImageOutset: `${border.outset ?? 0}px`,
+    }
+  }
+
+  return {
+    ...base,
+    border: `1px solid ${hovered ? ACCENT : FAINT}`,
+  }
+}
+
+// Legacy single-image frame: stretched over the (now image-sized) wrapper so it
+// hugs the picture instead of the media box.
+const legacyFrameStyle: React.CSSProperties = {
   position: 'absolute',
-  inset: hovered ? -8 : 0,
-  border: `1px solid ${hovered ? ACCENT : FAINT}`,
-  borderRadius: 4,
+  inset: 0,
+  width: '100%',
+  height: '100%',
   pointerEvents: 'none',
   zIndex: 1,
-  transition: 'inset 220ms ease, border-color 220ms ease',
-})
+}
 
 // Match the box height and preserve the image's native proportions; width
 // scales automatically so nothing gets cropped or stretched.
@@ -517,7 +574,8 @@ const boxImageStyle: React.CSSProperties = {
 }
 
 const boxImagePlaceholderStyle: React.CSSProperties = {
-  width: '100%',
+  width: 200,
+  maxWidth: '100%',
   height: '100%',
   display: 'flex',
   alignItems: 'center',

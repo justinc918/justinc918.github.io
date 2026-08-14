@@ -100,10 +100,21 @@ const EVENTS: TimelineEvent[] = [
   },
 ]
 
+const ASSETS = {
+  box: {
+    border: {
+      src: `${BASE}images/common/frame.svg`,
+      slice: 16,
+      width: 16,
+      repeat: 'stretch' as const,
+    },
+  },
+}
+
 export default function Digital() {
   return (
     <div style={pageStyle}>
-      <ArtworkTimeline events={EVENTS} credits={CREDITS} />
+      <ArtworkTimeline events={EVENTS} assets={ASSETS} credits={CREDITS} />
     </div>
   )
 }
