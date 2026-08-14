@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from 'react'
 
 export type TimelineEvent = {
   id: string
-  date: string
   title: string
+  date: string // month and year, e.g. "March 2024"
   imageSrc?: string
   imageAlt?: string
   description?: string
@@ -34,6 +34,7 @@ export type TimelineAssets = {
 type TimelineProps = {
   events: TimelineEvent[]
   assets?: TimelineAssets
+  credits?: React.ReactNode
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -46,6 +47,7 @@ const MUTED = 'rgba(196,211,255,0.8)'
 const FAINT = 'rgba(196,211,255,0.4)'
 
 const COLUMN_WIDTH = 320
+const FIRST_GAP_EXTRA = 920 // widen the first column so the gap to the second event runs extra long
 const LANE_HEIGHT = 260 // vertical space reserved for a box on one side of the line
 const CONNECTOR_UP = 26 // top images sit closer to the line
 const CONNECTOR_DOWN = 96 // bottom images sit ~2x farther from the line
@@ -58,7 +60,7 @@ const START_PADDING = 240 // extra room so the first piece's caption fits
 // Timeline
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function ArtworkTimeline({ events, assets }: TimelineProps) {
+export default function ArtworkTimeline({ events, assets, credits }: TimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   // Oldest (left) first: start pinned to the far left.
@@ -68,22 +70,31 @@ export default function ArtworkTimeline({ events, assets }: TimelineProps) {
 
   return (
     <div ref={scrollRef} style={scrollStyle}>
-      <div style={trackStyle}>
-        {events.map((event, index) => {
-          const above = index % 2 === 0
-          const isFirst = index === 0
-          const isLast = index === events.length - 1
-          return (
-            <TimelineColumn
-              key={event.id}
-              event={event}
-              above={above}
-              isFirst={isFirst}
-              isLast={isLast}
-              assets={assets}
-            />
-          )
-        })}
+      <div style={contentStyle}>
+        <div style={trackStyle}>
+          {events.map((event, index) => {
+            const above = index % 2 === 0
+            const isFirst = index === 0
+            const isLast = index === events.length - 1
+            return (
+              <TimelineColumn
+                key={event.id}
+                event={event}
+                above={above}
+                isFirst={isFirst}
+                isLast={isLast}
+                assets={assets}
+              />
+            )
+          })}
+        </div>
+        {credits && (
+          <div style={creditsRowStyle}>
+            <p style={creditsTextStyle}>
+              <strong style={creditsLabelStyle}>Credits</strong> {credits}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -102,10 +113,18 @@ type ColumnProps = {
 }
 
 function TimelineColumn({ event, above, isFirst, isLast, assets }: ColumnProps) {
+  // The first column is widened by FIRST_GAP_EXTRA. Because its point and box
+  // are centered, we shift them back left by half the extra width so the first
+  // image keeps its original left offset and only the gap after it grows.
+  const contentShift = isFirst ? -FIRST_GAP_EXTRA / 2 : 0
+  const shiftStyle: React.CSSProperties = contentShift
+    ? { transform: `translateX(${contentShift}px)` }
+    : {}
+
   return (
-    <div style={columnStyle}>
+    <div style={isFirst ? { ...columnStyle, width: COLUMN_WIDTH + FIRST_GAP_EXTRA } : columnStyle}>
       {/* Upper lane holds a box only when it points above the line */}
-      <div style={laneStyle('up')}>
+      <div style={{ ...laneStyle('up'), ...shiftStyle }}>
         {above && (
           <>
             <TimelineBox event={event} frame={assets?.box?.frame} />
@@ -114,7 +133,9 @@ function TimelineColumn({ event, above, isFirst, isLast, assets }: ColumnProps) 
         )}
       </div>
 
-      {/* Center spine: continuous line with a milestone point */}
+      {/* Center spine: continuous line with a milestone point. The line spans
+          the full (widened) column so it stays continuous; only the point is
+          shifted back to its original position. */}
       <div style={spineStyle}>
         <TimelineLine
           asset={assets?.line?.segment}
@@ -123,11 +144,13 @@ function TimelineColumn({ event, above, isFirst, isLast, assets }: ColumnProps) 
           showStartCap={isFirst}
           showEndCap={isLast}
         />
-        <TimelinePoint asset={assets?.point?.marker} />
+        <div style={shiftStyle}>
+          <TimelinePoint asset={assets?.point?.marker} />
+        </div>
       </div>
 
       {/* Lower lane holds a box only when it points below the line */}
-      <div style={laneStyle('down')}>
+      <div style={{ ...laneStyle('down'), ...shiftStyle }}>
         {!above && (
           <>
             <TimelineConnector asset={assets?.line?.connector} orientation="down" />
@@ -229,7 +252,7 @@ function TimelineBox({ event, frame }: { event: TimelineEvent; frame?: string })
   return (
     <figure
       style={boxStyle}
-      aria-label={`${event.date} — ${event.title}`}
+      aria-label={event.date ? `${event.title} — ${event.date}` : event.title}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setHovered(true)}
@@ -239,8 +262,8 @@ function TimelineBox({ event, frame }: { event: TimelineEvent; frame?: string })
       {/* Caption sits to the left of the image and fades in on hover. It is
           absolutely positioned so it never shifts the image layout. */}
       <figcaption style={boxCaptionStyle(hovered)}>
-        <span style={boxDateStyle}>{event.date}</span>
         <span style={boxTitleStyle}>{event.title}</span>
+        {event.date && <span style={boxDateStyle}>{event.date}</span>}
         {event.description && <span style={boxDescriptionStyle}>{event.description}</span>}
       </figcaption>
       <div style={boxMediaStyle(hovered)}>
@@ -272,17 +295,45 @@ const scrollStyle: React.CSSProperties = {
   height: '100%',
   overflowX: 'auto',
   overflowY: 'hidden',
+}
+
+// Stacks the timeline track and the credits line into one vertically-centered
+// column whose width is driven by the track, so both share a single horizontal
+// scroll region.
+const contentStyle: React.CSSProperties = {
+  minWidth: 'min-content',
+  minHeight: '100%',
   display: 'flex',
-  alignItems: 'center',
+  flexDirection: 'column',
+  justifyContent: 'center',
 }
 
 const trackStyle: React.CSSProperties = {
+  flex: '1 0 auto',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   minWidth: 'min-content',
-  margin: 'auto',
   padding: `0 64px 0 ${START_PADDING}px`,
+}
+
+const creditsRowStyle: React.CSSProperties = {
+  minWidth: 'min-content',
+  padding: `0 64px 20px ${START_PADDING}px`,
+  marginTop: 8,
+}
+
+const creditsTextStyle: React.CSSProperties = {
+  width: 'max-content',
+  color: MUTED,
+  fontSize: 15,
+  lineHeight: 1.4,
+  whiteSpace: 'nowrap',
+}
+
+const creditsLabelStyle: React.CSSProperties = {
+  color: '#fff',
+  fontWeight: 700,
 }
 
 const columnStyle: React.CSSProperties = {
@@ -495,10 +546,10 @@ const boxCaptionStyle = (hovered: boolean): React.CSSProperties => ({
 })
 
 const boxDateStyle: React.CSSProperties = {
-  color: MUTED,
-  fontSize: 13,
-  letterSpacing: '0.08em',
-  textTransform: 'uppercase',
+  color: ACCENT,
+  fontSize: 14,
+  fontWeight: 400,
+  letterSpacing: '0.02em',
 }
 
 const boxTitleStyle: React.CSSProperties = {
