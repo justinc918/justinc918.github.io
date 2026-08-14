@@ -27,3 +27,9 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Design / working source files
+*.psd
+*.ai
+*.sketch
+*.fig

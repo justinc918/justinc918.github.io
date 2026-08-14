@@ -29,8 +29,8 @@ export default function TopBar() {
   const navRef = useRef<HTMLElement>(null)
   const itemRefs = useRef<(HTMLElement | null)[]>([])
   const [indicator, setIndicator] = useState<Indicator>({ left: 0, width: 0, top: 0, visible: false })
+  const [animated, setAnimated] = useState(false)
 
-  // Index of the nav item that matches the current route (the "resting" position).
   const activeIndex =
     pathname === '/' ? 0
     : pathname.startsWith('/projects') ? 1
@@ -47,7 +47,6 @@ export default function TopBar() {
     }
     const navRect = nav.getBoundingClientRect()
     const rect = el.getBoundingClientRect()
-    // Fixed width: the widest of the five items, so the underline never resizes.
     const maxWidth = Math.max(
       ...itemRefs.current.map((item) => item?.getBoundingClientRect().width ?? 0),
     )
@@ -60,13 +59,21 @@ export default function TopBar() {
     })
   }, [])
 
-  // Rest under the active route item; re-measure on route change / resize.
+
   useLayoutEffect(() => {
+    if (!animated) {
+      moveTo(0)
+      const raf = requestAnimationFrame(() => {
+        setAnimated(true)
+        moveTo(activeIndex)
+      })
+      return () => cancelAnimationFrame(raf)
+    }
     moveTo(activeIndex)
     const onResize = () => moveTo(activeIndex)
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
-  }, [activeIndex, moveTo])
+  }, [activeIndex, moveTo, animated])
 
   const setItemRef = (index: number) => (el: HTMLElement | null) => {
     itemRefs.current[index] = el
@@ -84,6 +91,7 @@ export default function TopBar() {
         aria-hidden="true"
         style={{
           ...indicatorStyle,
+          transition: animated ? indicatorStyle.transition : 'none',
           width: indicator.width,
           transform: `translateX(${indicator.left}px)`,
           top: indicator.top,
