@@ -1,7 +1,7 @@
 const QA_ITEMS = [
   {
     question: 'UCLA course recommendations?',
-    answer: 'Both EC ENGR C147a (Deep Learning) and its sequel, C147b (Deep Learning II). The hype is real, but good luck getting into it lol (SUBMIT AN ECR!!). Com Sci M146 was also pretty good. For a lesser known course, EC ENGR 133a (Applied Numerical Computing) with Vandenberghe is also a cool, albeit pretty tough class. For this last one, it might just be me, but ART HIS 21 was fun.',
+    answer: 'Both EC ENGR C147a (Deep Learning) and its sequel, C147b (Deep Learning II). The hype is real, but good luck getting into it lol (SUBMIT AN ECR!!). COM SCI M146 is also solid. For a lesser known course, EC ENGR 133a (Applied Numerical Computing) with Vandenberghe is a cool, albeit tough mathy class. For this last one, it might just be me, but ART HIS 21 (Medieval Art) was more fun than expected.',
   },
   {
     question: 'What do you draw with?',
