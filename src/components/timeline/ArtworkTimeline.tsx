@@ -79,6 +79,7 @@ const POINT_SIZE = 22
 const BOX_RATIO = 4 / 3
 const CAPTION_WIDTH = 190 // caption sits to the left of the image
 const START_PADDING = 240 // extra room so the first piece's caption fits
+const LIGHTBOX_FRAME_SCALE = 2.6 // enlarges the frame's fixed corners in the popup
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Timeline
@@ -86,6 +87,8 @@ const START_PADDING = 240 // extra room so the first piece's caption fits
 
 export default function ArtworkTimeline({ events, assets, credits }: TimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  // The event whose image is expanded into the fullscreen lightbox, or null.
+  const [activeEvent, setActiveEvent] = useState<TimelineEvent | null>(null)
 
   // Oldest (left) first: start pinned to the far left.
   useEffect(() => {
@@ -108,6 +111,7 @@ export default function ArtworkTimeline({ events, assets, credits }: TimelinePro
                 isFirst={isFirst}
                 isLast={isLast}
                 assets={assets}
+                onOpen={setActiveEvent}
               />
             )
           })}
@@ -120,6 +124,13 @@ export default function ArtworkTimeline({ events, assets, credits }: TimelinePro
           </div>
         )}
       </div>
+      {activeEvent && (
+        <TimelineLightbox
+          event={activeEvent}
+          box={assets?.box}
+          onClose={() => setActiveEvent(null)}
+        />
+      )}
     </div>
   )
 }
@@ -134,9 +145,10 @@ type ColumnProps = {
   isFirst: boolean
   isLast: boolean
   assets?: TimelineAssets
+  onOpen: (event: TimelineEvent) => void
 }
 
-function TimelineColumn({ event, above, isFirst, isLast, assets }: ColumnProps) {
+function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen }: ColumnProps) {
   // The first column is widened by FIRST_GAP_EXTRA. Because its point and box
   // are centered, we shift them back left by half the extra width so the first
   // image keeps its original left offset and only the gap after it grows.
@@ -151,7 +163,7 @@ function TimelineColumn({ event, above, isFirst, isLast, assets }: ColumnProps) 
       <div style={{ ...laneStyle('up'), ...shiftStyle }}>
         {above && (
           <>
-            <TimelineBox event={event} box={assets?.box} />
+            <TimelineBox event={event} box={assets?.box} onOpen={onOpen} />
             <TimelineConnector asset={assets?.line?.connector} orientation="up" />
           </>
         )}
@@ -178,7 +190,7 @@ function TimelineColumn({ event, above, isFirst, isLast, assets }: ColumnProps) 
         {!above && (
           <>
             <TimelineConnector asset={assets?.line?.connector} orientation="down" />
-            <TimelineBox event={event} box={assets?.box} />
+            <TimelineBox event={event} box={assets?.box} onOpen={onOpen} />
           </>
         )}
       </div>
@@ -270,19 +282,40 @@ function TimelineConnector({
 // Box module (artwork card)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function TimelineBox({ event, box }: { event: TimelineEvent; box?: TimelineAssets['box'] }) {
+function TimelineBox({
+  event,
+  box,
+  onOpen,
+}: {
+  event: TimelineEvent
+  box?: TimelineAssets['box']
+  onOpen: (event: TimelineEvent) => void
+}) {
   const [hovered, setHovered] = useState(false)
   const border = box?.border
   const frame = box?.frame
+  const canOpen = Boolean(event.imageSrc)
+
+  const handleOpen = () => {
+    if (canOpen) onOpen(event)
+  }
 
   return (
     <figure
-      style={boxStyle}
+      style={canOpen ? { ...boxStyle, cursor: 'pointer' } : boxStyle}
       aria-label={event.date ? `${event.title} — ${event.date}` : event.title}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setHovered(true)}
       onBlur={() => setHovered(false)}
+      onClick={handleOpen}
+      onKeyDown={(e) => {
+        if (canOpen && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault()
+          handleOpen()
+        }
+      }}
+      role={canOpen ? 'button' : undefined}
       tabIndex={0}
     >
       {/* Caption sits to the left of the image and fades in on hover. It is
@@ -310,6 +343,74 @@ function TimelineBox({ event, box }: { event: TimelineEvent; box?: TimelineAsset
         </div>
       </div>
     </figure>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lightbox module (fullscreen expanded artwork)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function TimelineLightbox({
+  event,
+  box,
+  onClose,
+}: {
+  event: TimelineEvent
+  box?: TimelineAssets['box']
+  onClose: () => void
+}) {
+  const border = box?.border
+  const frame = box?.frame
+
+  // Close on Escape and lock background scroll while the popup is open.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [onClose])
+
+  return (
+    <div
+      style={lightboxOverlayStyle}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={event.date ? `${event.title} — ${event.date}` : event.title}
+    >
+      <style>{lightboxKeyframes}</style>
+      {/* Stop propagation so clicks on the artwork itself don't close the popup. */}
+      <figure style={lightboxFigureStyle} onClick={(e) => e.stopPropagation()}>
+        <div style={{ ...frameWrapStyle(false, border, LIGHTBOX_FRAME_SCALE), height: 'auto' }}>
+          {frame && !border && (
+            <img src={frame} alt="" aria-hidden="true" style={legacyFrameStyle} />
+          )}
+          {event.imageSrc && (
+            <img
+              src={event.imageSrc}
+              alt={event.imageAlt ?? event.title}
+              style={lightboxImageStyle}
+            />
+          )}
+        </div>
+        {(event.title || event.date || event.description) && (
+          <figcaption style={lightboxCaptionStyle}>
+            {event.title && <span style={boxTitleStyle}>{event.title}</span>}
+            {event.date && <span style={boxDateStyle}>{event.date}</span>}
+            {event.description && <span style={boxDescriptionStyle}>{event.description}</span>}
+          </figcaption>
+        )}
+      </figure>
+      <button type="button" style={lightboxCloseStyle} onClick={onClose} aria-label="Close">
+        ×
+      </button>
+    </div>
   )
 }
 
@@ -522,6 +623,9 @@ const boxMediaStyle = (hovered: boolean): React.CSSProperties => ({
 const frameWrapStyle = (
   hovered: boolean,
   border?: TimelineBoxBorder,
+  // Multiplies the on-screen border thickness so the frame's fixed corners are
+  // enlarged in the lightbox while the source slice stays the same.
+  scale = 1,
 ): React.CSSProperties => {
   const base: React.CSSProperties = {
     position: 'relative',
@@ -533,7 +637,8 @@ const frameWrapStyle = (
 
   if (border) {
     const sliceValue = Array.isArray(border.slice) ? border.slice.join(' ') : `${border.slice}`
-    const width = border.width ?? (Array.isArray(border.slice) ? border.slice[0] : border.slice)
+    const baseWidth = border.width ?? (Array.isArray(border.slice) ? border.slice[0] : border.slice)
+    const width = baseWidth * scale
     return {
       ...base,
       borderStyle: 'solid',
@@ -542,7 +647,7 @@ const frameWrapStyle = (
       borderImageSlice: sliceValue,
       borderImageWidth: `${width}px`,
       borderImageRepeat: border.repeat ?? 'stretch',
-      borderImageOutset: `${border.outset ?? 0}px`,
+      borderImageOutset: `${(border.outset ?? 0) * scale}px`,
     }
   }
 
@@ -627,4 +732,71 @@ const boxDescriptionStyle: React.CSSProperties = {
   color: MUTED,
   fontSize: 15,
   lineHeight: 1.5,
+}
+
+// Lightbox
+
+const lightboxKeyframes = `@keyframes artworkLightboxFade { from { opacity: 0 } to { opacity: 1 } }`
+
+const lightboxOverlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  zIndex: 1000,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 20,
+  padding: 32,
+  backgroundColor: 'rgba(6,10,26,0.82)',
+  backdropFilter: 'blur(6px)',
+  WebkitBackdropFilter: 'blur(6px)',
+  animation: 'artworkLightboxFade 180ms ease',
+}
+
+const lightboxFigureStyle: React.CSSProperties = {
+  margin: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 18,
+  maxWidth: '100%',
+  maxHeight: '100%',
+}
+
+const lightboxImageStyle: React.CSSProperties = {
+  display: 'block',
+  maxWidth: '82vw',
+  maxHeight: '78vh',
+  width: 'auto',
+  height: 'auto',
+  objectFit: 'contain',
+  borderRadius: 4,
+}
+
+const lightboxCaptionStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textAlign: 'center',
+  gap: 4,
+  maxWidth: 620,
+}
+
+const lightboxCloseStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 20,
+  right: 24,
+  width: 44,
+  height: 44,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 28,
+  lineHeight: 1,
+  color: ACCENT,
+  background: 'rgba(196,211,255,0.08)',
+  border: `1px solid ${FAINT}`,
+  borderRadius: '50%',
+  cursor: 'pointer',
 }
