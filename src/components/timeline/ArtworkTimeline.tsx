@@ -81,7 +81,8 @@ const MUTED = 'rgba(196,211,255,0.8)'
 const FAINT = 'rgba(196,211,255,0.4)'
 
 const COLUMN_WIDTH = 320
-const FIRST_GAP_EXTRA = 920 // widen the first column so the gap to the second event runs extra long
+const FIRST_GAP_EXTRA = 960 // widen the first column so the gap to the second event runs extra long
+const FIRST_GAP_REPEATS = 4 // tile the segment this many times across the extra gap width
 const LANE_HEIGHT = 260 // vertical space reserved for a box on one side of the line
 const CONNECTOR_UP = 26 // top images sit closer to the line
 const CONNECTOR_DOWN = 96 // bottom images sit ~2x farther from the line
@@ -189,6 +190,8 @@ function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen }: Colum
           endCap={isLast ? assets?.line?.endCap : undefined}
           showStartCap={isFirst}
           showEndCap={isLast}
+          gapRepeats={isFirst ? FIRST_GAP_REPEATS : undefined}
+          gapWidth={isFirst ? FIRST_GAP_EXTRA : undefined}
         />
         <div style={shiftStyle}>
           <TimelinePoint asset={assets?.point?.marker} />
@@ -218,15 +221,31 @@ type LineProps = {
   endCap?: string
   showStartCap: boolean
   showEndCap: boolean
+  /** Tile the segment across the widened first-column gap instead of stretching once. */
+  gapRepeats?: number
+  gapWidth?: number
 }
 
-function TimelineLine({ asset, startCap, endCap, showStartCap, showEndCap }: LineProps) {
+function TimelineLine({
+  asset,
+  startCap,
+  endCap,
+  showStartCap,
+  showEndCap,
+  gapRepeats,
+  gapWidth,
+}: LineProps) {
+  const hasGapRepeats = gapRepeats != null && gapWidth != null && gapRepeats > 0
+
   return (
     <div style={lineWrapStyle}>
-      {asset ? (
-        <img src={asset} alt="" aria-hidden="true" style={lineImageStyle} />
+      {hasGapRepeats ? (
+        <div style={lineSplitStyle}>
+          <LineSegment asset={asset} width={COLUMN_WIDTH} />
+          <LineSegment asset={asset} width={gapWidth} repeats={gapRepeats} />
+        </div>
       ) : (
-        <div style={linePlaceholderStyle} />
+        <LineSegment asset={asset} width="100%" />
       )}
       {showStartCap && (
         <div style={{ ...capStyle, left: 0 }}>
@@ -247,6 +266,52 @@ function TimelineLine({ asset, startCap, endCap, showStartCap, showEndCap }: Lin
         </div>
       )}
     </div>
+  )
+}
+
+function LineSegment({
+  asset,
+  width,
+  repeats,
+}: {
+  asset?: string
+  width: number | '100%'
+  repeats?: number
+}) {
+  if (repeats != null && repeats > 1 && typeof width === 'number') {
+    const tileWidth = width / repeats
+    return (
+      <div style={{ ...lineRepeatRowStyle, width }}>
+        {Array.from({ length: repeats }, (_, index) => (
+          <LineSegment key={index} asset={asset} width={tileWidth} />
+        ))}
+      </div>
+    )
+  }
+
+  if (asset) {
+    return (
+      <img
+        src={asset}
+        alt=""
+        aria-hidden="true"
+        style={{
+          ...lineImageStyle,
+          width,
+          ...(typeof width === 'number' ? { flexShrink: 0 } : {}),
+        }}
+      />
+    )
+  }
+
+  return (
+    <div
+      style={{
+        ...linePlaceholderStyle,
+        width,
+        ...(typeof width === 'number' ? { flexShrink: 0 } : {}),
+      }}
+    />
   )
 }
 
@@ -517,6 +582,18 @@ const lineWrapStyle: React.CSSProperties = {
   left: 0,
   width: '100%',
   transform: 'translateY(-50%)',
+}
+
+const lineSplitStyle: React.CSSProperties = {
+  display: 'flex',
+  width: '100%',
+  alignItems: 'center',
+}
+
+const lineRepeatRowStyle: React.CSSProperties = {
+  display: 'flex',
+  flexShrink: 0,
+  alignItems: 'center',
 }
 
 const lineImageStyle: React.CSSProperties = {

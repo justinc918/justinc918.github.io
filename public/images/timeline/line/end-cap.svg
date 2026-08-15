@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TEMPLATE  line/end-cap.svg
+  ---------------------------------------------------------------------------
+  Right end cap, drawn only on the rightmost (newest) item, pinned to the very
+  end of the line.
+
+  Rendered: height = 12px, width = auto (keeps this file's aspect ratio).
+  This 12 x 12 canvas => a 12px-wide cap.
+
+  DRAW HERE: the mirror of start-cap. Center on y=6; its RIGHT edge (x=12) is
+  the very end of the timeline.
+
+  Placeholder below is the left-pointing arrowhead the CSS currently shows.
+  Palette: line #ccd8ff.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
+  <polygon points="12,1 3,6 12,11" fill="#ccd8ff" />
+</svg>

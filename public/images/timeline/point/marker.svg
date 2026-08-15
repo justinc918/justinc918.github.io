@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TEMPLATE  point/marker.svg
+  ---------------------------------------------------------------------------
+  The milestone node that sits on the line at each item.
+
+  Rendered: 22 x 22px, drawn on a square canvas so its CENTER (x=11, y=11)
+  aligns exactly with the spine and the connector stem. Keep the visual mark
+  centered; leave transparent margin for any glow/ring.
+
+  Placeholder below is the filled dot + faint ring the CSS currently shows.
+  Palette: accent #c4d3ff.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+  <circle cx="11" cy="11" r="11" fill="#c4d3ff" fill-opacity="0.15" />
+  <circle cx="11" cy="11" r="7" fill="#c4d3ff" />
+</svg>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TEMPLATE  line/segment.svg
+  ---------------------------------------------------------------------------
+  The horizontal spine tile. One of these fills each 320px column (and the
+  widened first gap is tiled with four of them at 240px each).
+
+  Rendered: width stretches to the column, height = auto (keeps this file's
+  aspect ratio). So this canvas's WIDTH:HEIGHT ratio sets the on-screen line
+  thickness. 320 x 4 => ~4px thick at 320px wide.
+
+  DRAW HERE: a horizontal strip that runs edge to edge. Keep the stroke
+  centered on y=2 so it aligns with the point marker and connector. Left and
+  right edges must meet cleanly (identical at x=0 and x=320) so tiled copies
+  join without a seam.
+
+  Palette: line #ccd8ff on dark bg rgb(20,24,39).
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="4" viewBox="0 0 320 4">
+  <rect x="0" y="1" width="320" height="2" fill="#ccd8ff" />
+</svg>

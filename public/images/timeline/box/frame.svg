@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TEMPLATE  box/frame.svg  (legacy single-image frame)
+  ---------------------------------------------------------------------------
+  Simpler alternative to border.svg. Used as `assets.box.frame`. This whole
+  image is stretched over the picture's rendered box, so it warps to whatever
+  size the image is. Prefer border.svg (9-slice) if you want crisp corners.
+
+  Canvas: 256 x 192 (4:3, the media size). KEEP THE CENTER TRANSPARENT so the
+  photo and hover caption stay real HTML underneath. Draw only the border art
+  around the rim.
+
+  Placeholder below is a thin rim outline.
+  Palette: faint #c4d3ff.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="192" viewBox="0 0 256 192">
+  <rect x="0.5" y="0.5" width="255" height="191" rx="4" fill="none"
+        stroke="#c4d3ff" stroke-opacity="0.4" stroke-width="1" />
+</svg>
