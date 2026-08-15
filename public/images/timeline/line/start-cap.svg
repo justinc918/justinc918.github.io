@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  TEMPLATE  line/start-cap.svg
-  ---------------------------------------------------------------------------
+  TEMPLATE: line/start-cap.svg
+
   Left end cap, drawn only on the leftmost (oldest) item, pinned to the very
   start of the line.
 
   Rendered: height = 12px, width = auto (keeps this file's aspect ratio).
-  This 12 x 12 canvas => a 12px-wide cap. Change the width to make it wider.
+  This 12 by 12 canvas gives a 12px-wide cap. Change the width to make it wider.
 
   DRAW HERE: an end treatment (arrowhead, dot, bar, etc.) that sits centered
   on y=6 so it lines up with the 2px spine. Its LEFT edge (x=0) is the very

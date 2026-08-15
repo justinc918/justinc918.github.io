@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  TEMPLATE  line/connector.svg
-  ---------------------------------------------------------------------------
+  TEMPLATE: line/connector.svg
+
   Vertical stem joining the line to a box.
 
   Rendered: width = auto, height stretches to fit the gap:
-    - top boxes:    26px tall
-    - bottom boxes: 96px tall
+    top boxes    26px tall
+    bottom boxes 96px tall
   So this file's art is scaled vertically between those two heights. Keep the
   design simple/tileable along its length (a plain line or a repeating motif),
-  or it will look different at 26px vs 96px. This 12 x 96 canvas is the tall
+  or it will look different at 26px vs 96px. This 12 by 96 canvas is the tall
   (bottom) case.
 
   DRAW HERE: a vertical connector centered on x=6 so it meets the point above

@@ -102,6 +102,15 @@ const EVENTS: TimelineEvent[] = [
 ]
 
 const ASSETS = {
+  line: {
+    segment: `${BASE}images/timeline/line/segment.svg`,
+    startCap: `${BASE}images/timeline/line/start-cap.svg`,
+    endCap: `${BASE}images/timeline/line/end-cap.svg`,
+    connector: `${BASE}images/timeline/line/connector.svg`,
+  },
+  point: {
+    marker: `${BASE}images/timeline/point/marker.svg`,
+  },
   box: {
     border: {
       src: `${BASE}images/common/frame.svg`,

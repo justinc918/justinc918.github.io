@@ -240,10 +240,12 @@ function TimelineLine({
   return (
     <div style={lineWrapStyle}>
       {hasGapRepeats ? (
-        <div style={lineSplitStyle}>
-          <LineSegment asset={asset} width={COLUMN_WIDTH} />
-          <LineSegment asset={asset} width={gapWidth} repeats={gapRepeats} />
-        </div>
+        <LineSegment
+          asset={asset}
+          width={COLUMN_WIDTH + gapWidth}
+          repeats={gapRepeats}
+          tileWidth={COLUMN_WIDTH}
+        />
       ) : (
         <LineSegment asset={asset} width="100%" />
       )}
@@ -273,13 +275,14 @@ function LineSegment({
   asset,
   width,
   repeats,
+  tileWidth = COLUMN_WIDTH,
 }: {
   asset?: string
   width: number | '100%'
   repeats?: number
+  tileWidth?: number
 }) {
   if (repeats != null && repeats > 1 && typeof width === 'number') {
-    const tileWidth = width / repeats
     return (
       <div style={{ ...lineRepeatRowStyle, width }}>
         {Array.from({ length: repeats }, (_, index) => (
@@ -582,12 +585,6 @@ const lineWrapStyle: React.CSSProperties = {
   left: 0,
   width: '100%',
   transform: 'translateY(-50%)',
-}
-
-const lineSplitStyle: React.CSSProperties = {
-  display: 'flex',
-  width: '100%',
-  alignItems: 'center',
 }
 
 const lineRepeatRowStyle: React.CSSProperties = {

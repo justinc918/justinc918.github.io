@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  TEMPLATE  point/marker.svg
-  ---------------------------------------------------------------------------
+  TEMPLATE: point/marker.svg
+
   The milestone node that sits on the line at each item.
 
-  Rendered: 22 x 22px, drawn on a square canvas so its CENTER (x=11, y=11)
+  Rendered: 22 by 22px, drawn on a square canvas so its CENTER (x=11, y=11)
   aligns exactly with the spine and the connector stem. Keep the visual mark
   centered; leave transparent margin for any glow/ring.
 
