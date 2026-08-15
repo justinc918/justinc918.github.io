@@ -107,9 +107,11 @@ const ASSETS = {
       src: `${BASE}images/common/frame.svg`,
       slice: 16,
       width: 16,
-      // 'repeat' tiles the edge art at native size instead of stretching it,
-      // so the accent lines keep their exact thickness on every piece.
-      repeat: 'repeat' as const,
+      // The edge art is just straight lines running along each side, so we
+      // 'stretch' rather than tile it. Stretching a straight line lengthwise
+      // looks identical but has no tile boundaries, so no hairline gaps open
+      // up between segments when the frame is scaled on hover.
+      repeat: 'stretch' as const,
     },
   },
 }

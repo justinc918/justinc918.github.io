@@ -643,6 +643,13 @@ const frameWrapStyle = (
     boxSizing: 'content-box',
     borderRadius: 4,
     transition: 'border-color 220ms ease',
+    // Rasterize the tiled border-image into its own compositor layer so the
+    // hover scale on the parent stretches this finished texture rather than
+    // re-tiling the segments at a fractional size (which opens hairline gaps
+    // between the repeated frame pieces).
+    transform: 'translateZ(0)',
+    backfaceVisibility: 'hidden',
+    WebkitBackfaceVisibility: 'hidden',
   }
 
   if (border) {
