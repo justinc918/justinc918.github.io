@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
+<style type="text/css">
+	.st0{display:none;fill:url(#SVGID_1_);fill-opacity:0.7;}
+	.st1{display:none;fill:url(#SVGID_00000076597144568931718430000016615577906240070578_);fill-opacity:0.7;}
+	.st2{fill:#98B3E6;fill-opacity:0.7;}
+</style>
+<radialGradient id="SVGID_1_" cx="-379.3816" cy="56.4985" r="3.2331" gradientTransform="matrix(1.6833 0 0 -1.1029 645.613 73.3122)" gradientUnits="userSpaceOnUse">
+	<stop  offset="0.6238" style="stop-color:#4D6FA8"/>
+	<stop  offset="1" style="stop-color:#E0E9FF"/>
+</radialGradient>
+<rect x="6" y="6" class="st0" width="2" height="10"/>
+<radialGradient id="SVGID_00000046340203207620716360000010029738314415614130_" cx="-630.5936" cy="1405.849" r="3.2331" gradientTransform="matrix(0 1.6833 1.1029 0 -1539.5109 1068.4781)" gradientUnits="userSpaceOnUse">
+	<stop  offset="0.6238" style="stop-color:#4D6FA8"/>
+	<stop  offset="1" style="stop-color:#E0E9FF"/>
+</radialGradient>
+<polygon style="display:none;fill:url(#SVGID_00000046340203207620716360000010029738314415614130_);fill-opacity:0.7;" points="
+	16,8 16,6 6,6 6,8 "/>
+<rect y="2" class="st2" width="16" height="2"/>
+<rect y="8.5" class="st2" width="16" height="2"/>
+</svg>

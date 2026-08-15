@@ -1,5 +1,6 @@
 const BASE = import.meta.env.BASE_URL
 const LONG_HORIZ = `${BASE}images/common/long_horiz.svg`
+const VIETCONG = `${BASE}images/other/vietcong.png`
 
 const LOREM =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.'
@@ -33,13 +34,13 @@ type Project = {
   description: string
   href: string
   liveHref?: string
-  hasImage?: boolean
+  image?: string
 }
 
 const PROJECTS: Project[] = [
-  { title: 'Canary', description: 'Canary is a tool that lets users track their AI agent\'s development and roll back to previous versions in case of behavior issues. So in a nutshell, version control for agents. Made for LAHacks 2026.', href: 'https://github.com/arnav0202006/Canary' },
-  { title: 'Argion', description: 'Argion is an all-in-one app for monitoring asteroids. Included are AI-driven classifications for asteroid severity and the best ways for astronomers to observe them, including locations and telescope settings. We also included some fun features like how you could theoretically travel to other planets by shooting off asteroids. Made for Berkeley AI Hackathon 2026.', href: 'https://github.com/justinc918/Argion' },
-  { title: '35L Project', description: 'Our team project for the infamous UCLA CS 35L course. We built ', href: 'https://github.com/lordboba/35Lproject', liveHref: 'https://35-lproject.vercel.app/app/lobby', hasImage: true },
+  { title: 'Canary', description: 'Canary is a tool that lets users track their AI agent\'s development and roll back to previous versions in case of behavior issues. So in a nutshell, version control for agents. Made for LAHacks 2026. \\o to my teammates Rithvik, Arnav, and Bryan!', href: 'https://github.com/arnav0202006/Canary' },
+  { title: 'Argion', description: 'Argion is an all-in-one app for monitoring asteroids. Included are AI-driven classifications for asteroid severity and the best ways for astronomers to observe them, including locations and telescope settings. We also included some fun features like how you could theoretically travel to other planets by shooting off asteroids. Made for Berkeley AI Hackathon 2026. \\o to my teammates Arnav (a different one) and William!', href: 'https://github.com/justinc918/Argion' },
+  { title: '35L Project', description: 'Our team project for the infamous UCLA CS 35L course. We built a website featuring two rather obscure card games. We support multiplayer, stats tracking, and match recording. Check it out, the site\'s still online: https://35-lproject.vercel.app. \\o to my teammates Tyler, Ethan, Prabhvir, and Tejas!', href: 'https://github.com/lordboba/35Lproject', liveHref: 'https://35-lproject.vercel.app/app/lobby', image: VIETCONG },
 ]
 
 export default function Projects() {
@@ -76,9 +77,9 @@ export default function Projects() {
                     </a>
                   )}
                 </div>
-                {project.hasImage && (
-                  <div style={imagePlaceholderStyle}>
-                    <span style={imagePlaceholderLabelStyle}>Add image here</span>
+                {project.image && (
+                  <div style={imageFrameStyle}>
+                    <img src={project.image} alt={`${project.title} preview`} style={imageStyle} />
                   </div>
                 )}
               </div>
@@ -154,21 +155,18 @@ const descriptionStyle: React.CSSProperties = {
   margin: 0,
 }
 
-const imagePlaceholderStyle: React.CSSProperties = {
+const imageFrameStyle: React.CSSProperties = {
   width: '100%',
-  height: 140,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  border: '1px dashed rgba(196,211,255,0.4)',
+  padding: 8,
+  border: '1px solid rgba(196,211,255,0.4)',
   borderRadius: 4,
-  backgroundColor: 'rgba(196,211,255,0.04)',
 }
 
-const imagePlaceholderLabelStyle: React.CSSProperties = {
-  color: 'rgba(196,211,255,0.5)',
-  fontSize: 14,
-  letterSpacing: '0.03em',
+const imageStyle: React.CSSProperties = {
+  width: '100%',
+  height: 'auto',
+  display: 'block',
+  borderRadius: 4,
 }
 
 const dividerStyle: React.CSSProperties = {

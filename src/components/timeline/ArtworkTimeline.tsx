@@ -6,12 +6,43 @@ import { useEffect, useRef, useState } from 'react'
 
 export type TimelineEvent = {
   id: string
-  date: string
   title: string
+  date: string // month and year, e.g. "March 2024"
   imageSrc?: string
   imageAlt?: string
   description?: string
 }
+
+// A 9-slice border: the source image is cut into 4 fixed corners, 4 stretchable
+// (or tileable) edges, and a discarded center. Corners keep their pixel size at
+// any box dimension; only the straight edges scale. This is how the frame is
+// made to hug the image no matter its aspect ratio.
+export type TimelineBoxBorder = {
+  /** Frame image whose four corners stay fixed and whose edges stretch/tile. */
+  src: string
+  /**
+   * Distance (in SOURCE-image px) from each edge inward to where the corner
+   * ends. A single number applies to all four sides; pass
+   * [top, right, bottom, left] for asymmetric art.
+   */
+  slice: number | [number, number, number, number]
+  /** On-screen thickness of the border. Defaults to `slice` (single-number form). */
+  width?: number
+  /**
+   * How the straight edge tile fills the gap between corners along its length
+   * (the cross-axis thickness is always fixed at `width`, never scaled):
+   *   - 'stretch': uniformly rescales the tile to fit — warps any pattern.
+   *   - 'repeat':  tiles the source at native size, clipping the last copy.
+   *   - 'round':   tiles at (near-)native size so a whole number always fits.
+   * Pass a tuple to control axes independently, per the CSS spec order:
+   * [top & bottom edges, left & right edges].
+   */
+  repeat?: BorderRepeatMode | [BorderRepeatMode, BorderRepeatMode]
+  /** How far (px) the frame sits outside the image edge. Defaults to 0. */
+  outset?: number
+}
+
+export type BorderRepeatMode = 'stretch' | 'repeat' | 'round'
 
 // Asset slots are grouped by type so each visual layer can be swapped for a
 // custom SVG later without touching layout logic. Any slot left undefined falls
@@ -27,6 +58,9 @@ export type TimelineAssets = {
     marker?: string
   }
   box?: {
+    /** 9-slice frame that dynamically hugs the image. Preferred. */
+    border?: TimelineBoxBorder
+    /** Legacy single-image frame stretched over the image bounds. */
     frame?: string
   }
 }
@@ -34,6 +68,7 @@ export type TimelineAssets = {
 type TimelineProps = {
   events: TimelineEvent[]
   assets?: TimelineAssets
+  credits?: React.ReactNode
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -46,6 +81,7 @@ const MUTED = 'rgba(196,211,255,0.8)'
 const FAINT = 'rgba(196,211,255,0.4)'
 
 const COLUMN_WIDTH = 320
+const FIRST_GAP_EXTRA = 920 // widen the first column so the gap to the second event runs extra long
 const LANE_HEIGHT = 260 // vertical space reserved for a box on one side of the line
 const CONNECTOR_UP = 26 // top images sit closer to the line
 const CONNECTOR_DOWN = 96 // bottom images sit ~2x farther from the line
@@ -53,13 +89,16 @@ const POINT_SIZE = 22
 const BOX_RATIO = 4 / 3
 const CAPTION_WIDTH = 190 // caption sits to the left of the image
 const START_PADDING = 240 // extra room so the first piece's caption fits
+const LIGHTBOX_FRAME_SCALE = 2.6 // enlarges the frame's fixed corners in the popup
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Timeline
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function ArtworkTimeline({ events, assets }: TimelineProps) {
+export default function ArtworkTimeline({ events, assets, credits }: TimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  // The event whose image is expanded into the fullscreen lightbox, or null.
+  const [activeEvent, setActiveEvent] = useState<TimelineEvent | null>(null)
 
   // Oldest (left) first: start pinned to the far left.
   useEffect(() => {
@@ -68,23 +107,40 @@ export default function ArtworkTimeline({ events, assets }: TimelineProps) {
 
   return (
     <div ref={scrollRef} style={scrollStyle}>
-      <div style={trackStyle}>
-        {events.map((event, index) => {
-          const above = index % 2 === 0
-          const isFirst = index === 0
-          const isLast = index === events.length - 1
-          return (
-            <TimelineColumn
-              key={event.id}
-              event={event}
-              above={above}
-              isFirst={isFirst}
-              isLast={isLast}
-              assets={assets}
-            />
-          )
-        })}
+      <div style={contentStyle}>
+        <div style={trackStyle}>
+          {events.map((event, index) => {
+            const above = index % 2 === 0
+            const isFirst = index === 0
+            const isLast = index === events.length - 1
+            return (
+              <TimelineColumn
+                key={event.id}
+                event={event}
+                above={above}
+                isFirst={isFirst}
+                isLast={isLast}
+                assets={assets}
+                onOpen={setActiveEvent}
+              />
+            )
+          })}
+        </div>
+        {credits && (
+          <div style={creditsRowStyle}>
+            <p style={creditsTextStyle}>
+              <strong style={creditsLabelStyle}>Credits</strong> {credits}
+            </p>
+          </div>
+        )}
       </div>
+      {activeEvent && (
+        <TimelineLightbox
+          event={activeEvent}
+          box={assets?.box}
+          onClose={() => setActiveEvent(null)}
+        />
+      )}
     </div>
   )
 }
@@ -99,22 +155,33 @@ type ColumnProps = {
   isFirst: boolean
   isLast: boolean
   assets?: TimelineAssets
+  onOpen: (event: TimelineEvent) => void
 }
 
-function TimelineColumn({ event, above, isFirst, isLast, assets }: ColumnProps) {
+function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen }: ColumnProps) {
+  // The first column is widened by FIRST_GAP_EXTRA. Because its point and box
+  // are centered, we shift them back left by half the extra width so the first
+  // image keeps its original left offset and only the gap after it grows.
+  const contentShift = isFirst ? -FIRST_GAP_EXTRA / 2 : 0
+  const shiftStyle: React.CSSProperties = contentShift
+    ? { transform: `translateX(${contentShift}px)` }
+    : {}
+
   return (
-    <div style={columnStyle}>
+    <div style={isFirst ? { ...columnStyle, width: COLUMN_WIDTH + FIRST_GAP_EXTRA } : columnStyle}>
       {/* Upper lane holds a box only when it points above the line */}
-      <div style={laneStyle('up')}>
+      <div style={{ ...laneStyle('up'), ...shiftStyle }}>
         {above && (
           <>
-            <TimelineBox event={event} frame={assets?.box?.frame} />
+            <TimelineBox event={event} box={assets?.box} onOpen={onOpen} />
             <TimelineConnector asset={assets?.line?.connector} orientation="up" />
           </>
         )}
       </div>
 
-      {/* Center spine: continuous line with a milestone point */}
+      {/* Center spine: continuous line with a milestone point. The line spans
+          the full (widened) column so it stays continuous; only the point is
+          shifted back to its original position. */}
       <div style={spineStyle}>
         <TimelineLine
           asset={assets?.line?.segment}
@@ -123,15 +190,17 @@ function TimelineColumn({ event, above, isFirst, isLast, assets }: ColumnProps) 
           showStartCap={isFirst}
           showEndCap={isLast}
         />
-        <TimelinePoint asset={assets?.point?.marker} />
+        <div style={shiftStyle}>
+          <TimelinePoint asset={assets?.point?.marker} />
+        </div>
       </div>
 
       {/* Lower lane holds a box only when it points below the line */}
-      <div style={laneStyle('down')}>
+      <div style={{ ...laneStyle('down'), ...shiftStyle }}>
         {!above && (
           <>
             <TimelineConnector asset={assets?.line?.connector} orientation="down" />
-            <TimelineBox event={event} frame={assets?.box?.frame} />
+            <TimelineBox event={event} box={assets?.box} onOpen={onOpen} />
           </>
         )}
       </div>
@@ -223,43 +292,135 @@ function TimelineConnector({
 // Box module (artwork card)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function TimelineBox({ event, frame }: { event: TimelineEvent; frame?: string }) {
+function TimelineBox({
+  event,
+  box,
+  onOpen,
+}: {
+  event: TimelineEvent
+  box?: TimelineAssets['box']
+  onOpen: (event: TimelineEvent) => void
+}) {
   const [hovered, setHovered] = useState(false)
+  const border = box?.border
+  const frame = box?.frame
+  const canOpen = Boolean(event.imageSrc)
+
+  const handleOpen = () => {
+    if (canOpen) onOpen(event)
+  }
 
   return (
     <figure
-      style={boxStyle}
-      aria-label={`${event.date} — ${event.title}`}
+      style={canOpen ? { ...boxStyle, cursor: 'pointer' } : boxStyle}
+      aria-label={event.date ? `${event.title} — ${event.date}` : event.title}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setHovered(true)}
       onBlur={() => setHovered(false)}
+      onClick={handleOpen}
+      onKeyDown={(e) => {
+        if (canOpen && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault()
+          handleOpen()
+        }
+      }}
+      role={canOpen ? 'button' : undefined}
       tabIndex={0}
     >
       {/* Caption sits to the left of the image and fades in on hover. It is
           absolutely positioned so it never shifts the image layout. */}
       <figcaption style={boxCaptionStyle(hovered)}>
-        <span style={boxDateStyle}>{event.date}</span>
         <span style={boxTitleStyle}>{event.title}</span>
+        {event.date && <span style={boxDateStyle}>{event.date}</span>}
         {event.description && <span style={boxDescriptionStyle}>{event.description}</span>}
       </figcaption>
       <div style={boxMediaStyle(hovered)}>
-        {/* Border art: uses the custom frame when supplied, otherwise a plain
-            rectangle placeholder. Expands slightly outward on hover. */}
-        {frame ? (
-          <img src={frame} alt="" aria-hidden="true" style={boxFrameStyle(hovered)} />
-        ) : (
-          <div style={boxBorderPlaceholderStyle(hovered)} />
-        )}
-        {event.imageSrc ? (
-          <img src={event.imageSrc} alt={event.imageAlt ?? event.title} style={boxImageStyle} />
-        ) : (
-          <div style={boxImagePlaceholderStyle}>
-            <span style={boxPlaceholderLabelStyle}>Add image here</span>
-          </div>
-        )}
+        {/* The frame wrapper shrink-wraps to the image's real rendered size, so
+            whatever border it carries hugs the picture rather than the 4:3
+            media box. Border priority: 9-slice > legacy frame > placeholder. */}
+        <div style={frameWrapStyle(hovered, border)}>
+          {frame && !border && (
+            <img src={frame} alt="" aria-hidden="true" style={legacyFrameStyle} />
+          )}
+          {event.imageSrc ? (
+            <img src={event.imageSrc} alt={event.imageAlt ?? event.title} style={boxImageStyle} />
+          ) : (
+            <div style={boxImagePlaceholderStyle}>
+              <span style={boxPlaceholderLabelStyle}>Add image here</span>
+            </div>
+          )}
+        </div>
       </div>
     </figure>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lightbox module (fullscreen expanded artwork)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function TimelineLightbox({
+  event,
+  box,
+  onClose,
+}: {
+  event: TimelineEvent
+  box?: TimelineAssets['box']
+  onClose: () => void
+}) {
+  const border = box?.border
+  const frame = box?.frame
+
+  // Close on Escape and lock background scroll while the popup is open.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [onClose])
+
+  return (
+    <div
+      style={lightboxOverlayStyle}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={event.date ? `${event.title} — ${event.date}` : event.title}
+    >
+      <style>{lightboxKeyframes}</style>
+      {/* Stop propagation so clicks on the artwork itself don't close the popup. */}
+      <figure style={lightboxFigureStyle} onClick={(e) => e.stopPropagation()}>
+        <div style={{ ...frameWrapStyle(false, border, LIGHTBOX_FRAME_SCALE), height: 'auto' }}>
+          {frame && !border && (
+            <img src={frame} alt="" aria-hidden="true" style={legacyFrameStyle} />
+          )}
+          {event.imageSrc && (
+            <img
+              src={event.imageSrc}
+              alt={event.imageAlt ?? event.title}
+              style={lightboxImageStyle}
+            />
+          )}
+        </div>
+        {(event.title || event.date || event.description) && (
+          <figcaption style={lightboxCaptionStyle}>
+            {event.title && <span style={boxTitleStyle}>{event.title}</span>}
+            {event.date && <span style={boxDateStyle}>{event.date}</span>}
+            {event.description && <span style={boxDescriptionStyle}>{event.description}</span>}
+          </figcaption>
+        )}
+      </figure>
+      <button type="button" style={lightboxCloseStyle} onClick={onClose} aria-label="Close">
+        ×
+      </button>
+    </div>
   )
 }
 
@@ -272,17 +433,51 @@ const scrollStyle: React.CSSProperties = {
   height: '100%',
   overflowX: 'auto',
   overflowY: 'hidden',
+}
+
+// Stacks the timeline track and the credits line into one vertically-centered
+// column whose width is driven by the track, so both share a single horizontal
+// scroll region.
+const contentStyle: React.CSSProperties = {
+  minWidth: 'min-content',
+  minHeight: '100%',
   display: 'flex',
-  alignItems: 'center',
+  flexDirection: 'column',
+  justifyContent: 'center',
 }
 
 const trackStyle: React.CSSProperties = {
+  flex: '1 0 auto',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   minWidth: 'min-content',
-  margin: 'auto',
   padding: `0 64px 0 ${START_PADDING}px`,
+}
+
+const creditsRowStyle: React.CSSProperties = {
+  minWidth: 'min-content',
+  padding: `0 64px 20px ${START_PADDING}px`,
+  marginTop: 8,
+}
+
+const creditsTextStyle: React.CSSProperties = {
+  width: 'max-content',
+  color: MUTED,
+  fontSize: 15,
+  lineHeight: 1.4,
+  whiteSpace: 'nowrap',
+}
+
+const creditsLabelStyle: React.CSSProperties = {
+  color: '#fff',
+  fontWeight: 700,
+}
+
+// Wrap important words inside `credits` with this to make them stand out in the
+// brighter accent blue, while surrounding text stays the muted blue.
+export function CreditHighlight({ children }: { children: React.ReactNode }) {
+  return <span style={{ color: ACCENT }}>{children}</span>
 }
 
 const columnStyle: React.CSSProperties = {
@@ -423,39 +618,81 @@ const boxMediaStyle = (hovered: boolean): React.CSSProperties => ({
   transform: hovered ? 'scale(1.05)' : 'scale(1)',
   transition: 'transform 220ms ease',
   transformOrigin: 'center',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 })
 
-const boxFrameStyle = (hovered: boolean): React.CSSProperties => ({
+// Shrink-wraps the image (image is height:100% / width:auto, so the wrapper
+// takes the image's exact rendered box) and carries the border. This is what
+// makes the frame track each image's real dimensions.
+//   - 9-slice border  -> border-image (fixed corners, stretchable edges)
+//   - no border art    -> a thin placeholder rectangle
+// The border is drawn OUTSIDE the content (content-box), so the image still
+// fills the full box height while the frame sits around it.
+const frameWrapStyle = (
+  hovered: boolean,
+  border?: TimelineBoxBorder,
+  // Multiplies the on-screen border thickness so the frame's fixed corners are
+  // enlarged in the lightbox while the source slice stays the same.
+  scale = 1,
+): React.CSSProperties => {
+  const base: React.CSSProperties = {
+    position: 'relative',
+    height: '100%',
+    boxSizing: 'content-box',
+    borderRadius: 4,
+    transition: 'border-color 220ms ease',
+  }
+
+  if (border) {
+    const sliceValue = Array.isArray(border.slice) ? border.slice.join(' ') : `${border.slice}`
+    const baseWidth = border.width ?? (Array.isArray(border.slice) ? border.slice[0] : border.slice)
+    const width = baseWidth * scale
+    return {
+      ...base,
+      borderStyle: 'solid',
+      borderWidth: width,
+      borderImageSource: `url(${border.src})`,
+      borderImageSlice: sliceValue,
+      borderImageWidth: `${width}px`,
+      borderImageRepeat: Array.isArray(border.repeat)
+        ? border.repeat.join(' ')
+        : border.repeat ?? 'stretch',
+      borderImageOutset: `${(border.outset ?? 0) * scale}px`,
+    }
+  }
+
+  return {
+    ...base,
+    border: `1px solid ${hovered ? ACCENT : FAINT}`,
+  }
+}
+
+// Legacy single-image frame: stretched over the (now image-sized) wrapper so it
+// hugs the picture instead of the media box.
+const legacyFrameStyle: React.CSSProperties = {
   position: 'absolute',
-  inset: hovered ? -8 : 0,
-  width: 'auto',
-  height: 'auto',
-  pointerEvents: 'none',
-  zIndex: 1,
-  transition: 'inset 220ms ease',
-})
-
-// Placeholder rectangle border, stands in for the frame art the user adds later.
-const boxBorderPlaceholderStyle = (hovered: boolean): React.CSSProperties => ({
-  position: 'absolute',
-  inset: hovered ? -8 : 0,
-  border: `1px solid ${hovered ? ACCENT : FAINT}`,
-  borderRadius: 4,
-  pointerEvents: 'none',
-  zIndex: 1,
-  transition: 'inset 220ms ease, border-color 220ms ease',
-})
-
-const boxImageStyle: React.CSSProperties = {
-  display: 'block',
+  inset: 0,
   width: '100%',
   height: '100%',
-  objectFit: 'cover',
+  pointerEvents: 'none',
+  zIndex: 1,
+}
+
+// Match the box height and preserve the image's native proportions; width
+// scales automatically so nothing gets cropped or stretched.
+const boxImageStyle: React.CSSProperties = {
+  display: 'block',
+  height: '100%',
+  width: 'auto',
+  objectFit: 'contain',
   borderRadius: 4,
 }
 
 const boxImagePlaceholderStyle: React.CSSProperties = {
-  width: '100%',
+  width: 200,
+  maxWidth: '100%',
   height: '100%',
   display: 'flex',
   alignItems: 'center',
@@ -490,10 +727,10 @@ const boxCaptionStyle = (hovered: boolean): React.CSSProperties => ({
 })
 
 const boxDateStyle: React.CSSProperties = {
-  color: MUTED,
-  fontSize: 13,
-  letterSpacing: '0.08em',
-  textTransform: 'uppercase',
+  color: ACCENT,
+  fontSize: 14,
+  fontWeight: 400,
+  letterSpacing: '0.02em',
 }
 
 const boxTitleStyle: React.CSSProperties = {
@@ -507,4 +744,71 @@ const boxDescriptionStyle: React.CSSProperties = {
   color: MUTED,
   fontSize: 15,
   lineHeight: 1.5,
+}
+
+// Lightbox
+
+const lightboxKeyframes = `@keyframes artworkLightboxFade { from { opacity: 0 } to { opacity: 1 } }`
+
+const lightboxOverlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  zIndex: 1000,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 20,
+  padding: 32,
+  backgroundColor: 'rgba(6,10,26,0.82)',
+  backdropFilter: 'blur(6px)',
+  WebkitBackdropFilter: 'blur(6px)',
+  animation: 'artworkLightboxFade 180ms ease',
+}
+
+const lightboxFigureStyle: React.CSSProperties = {
+  margin: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 18,
+  maxWidth: '100%',
+  maxHeight: '100%',
+}
+
+const lightboxImageStyle: React.CSSProperties = {
+  display: 'block',
+  maxWidth: '82vw',
+  maxHeight: '78vh',
+  width: 'auto',
+  height: 'auto',
+  objectFit: 'contain',
+  borderRadius: 4,
+}
+
+const lightboxCaptionStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textAlign: 'center',
+  gap: 4,
+  maxWidth: 620,
+}
+
+const lightboxCloseStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 20,
+  right: 24,
+  width: 44,
+  height: 44,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 28,
+  lineHeight: 1,
+  color: ACCENT,
+  background: 'rgba(196,211,255,0.08)',
+  border: `1px solid ${FAINT}`,
+  borderRadius: '50%',
+  cursor: 'pointer',
 }
