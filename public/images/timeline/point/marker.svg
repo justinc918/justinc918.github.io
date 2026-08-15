@@ -1,17 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  TEMPLATE: point/marker.svg
-
-  The milestone node that sits on the line at each item.
-
-  Rendered: 22 by 22px, drawn on a square canvas so its CENTER (x=11, y=11)
-  aligns exactly with the spine and the connector stem. Keep the visual mark
-  centered; leave transparent margin for any glow/ring.
-
-  Placeholder below is the filled dot + faint ring the CSS currently shows.
-  Palette: accent #c4d3ff.
--->
-<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
-  <circle cx="11" cy="11" r="11" fill="#c4d3ff" fill-opacity="0.15" />
-  <circle cx="11" cy="11" r="7" fill="#c4d3ff" />
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#C4D3FF;fill-opacity:0.15;}
+	.st1{fill:#FFFFFF;fill-opacity:0.15;}
+	.st2{fill:none;stroke:#C4D3FF;stroke-width:0.5;stroke-miterlimit:10;}
+</style>
+<circle class="st0" cx="11" cy="11" r="11"/>
+<rect x="6.7" y="6.7" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.5563 11)" class="st1" width="8.6" height="8.6"/>
+<rect x="3.5" y="3.5" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.5563 11)" class="st2" width="15" height="15"/>
+<rect x="4.7" y="4.7" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.5563 11)" class="st2" width="12.7" height="12.7"/>
 </svg>

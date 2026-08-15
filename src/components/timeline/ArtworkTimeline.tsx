@@ -83,11 +83,13 @@ const FAINT = 'rgba(196,211,255,0.4)'
 const COLUMN_WIDTH = 320
 const FIRST_GAP_EXTRA = 960 // widen the first column so the gap to the second event runs extra long
 const FIRST_GAP_REPEATS = 4 // tile the segment this many times across the extra gap width
-const LANE_HEIGHT = 260 // vertical space reserved for a box on one side of the line
-const CONNECTOR_UP = 26 // top images sit closer to the line
-const CONNECTOR_DOWN = 96 // bottom images sit ~2x farther from the line
-const POINT_SIZE = 22
 const BOX_RATIO = 4 / 3
+const BOX_WIDTH = COLUMN_WIDTH - 64
+const BOX_HEIGHT = BOX_WIDTH / BOX_RATIO
+const CONNECTOR_GAP = 4 // space between connector and spine
+const CONNECTOR_LENGTH = 26 // same stem length above and below the line
+const LANE_HEIGHT = CONNECTOR_LENGTH + CONNECTOR_GAP + BOX_HEIGHT
+const POINT_SIZE = 22
 const CAPTION_WIDTH = 190 // caption sits to the left of the image
 const START_PADDING = 240 // extra room so the first piece's caption fits
 const LIGHTBOX_FRAME_SCALE = 2.6 // enlarges the frame's fixed corners in the popup
@@ -348,7 +350,12 @@ function TimelineConnector({
   return (
     <div style={connectorWrapStyle(orientation)}>
       {asset ? (
-        <img src={asset} alt="" aria-hidden="true" style={connectorImageStyle} />
+        <img
+          src={asset}
+          alt=""
+          aria-hidden="true"
+          style={orientation === 'down' ? connectorImageFlippedStyle : connectorImageStyle}
+        />
       ) : (
         <div style={connectorPlaceholderStyle} />
       )}
@@ -657,17 +664,26 @@ const pointPlaceholderStyle: React.CSSProperties = {
 
 const connectorWrapStyle = (orientation: 'up' | 'down'): React.CSSProperties => ({
   width: 12,
-  height: orientation === 'up' ? CONNECTOR_UP : CONNECTOR_DOWN,
+  height: CONNECTOR_LENGTH,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  ...(orientation === 'up' ? { marginTop: 4 } : { marginBottom: 4 }),
+  flexShrink: 0,
+  ...(orientation === 'up' ? { marginTop: CONNECTOR_GAP } : { marginBottom: CONNECTOR_GAP }),
 })
 
 const connectorImageStyle: React.CSSProperties = {
   display: 'block',
   width: 'auto',
   height: '100%',
+}
+
+// The connector art is drawn for the top (up) case; flip it vertically for
+// the bottom (down) case so any asymmetric detail (taper, arrow, etc.) points
+// away from the spine on both sides instead of repeating the same direction.
+const connectorImageFlippedStyle: React.CSSProperties = {
+  ...connectorImageStyle,
+  transform: 'scaleY(-1)',
 }
 
 const connectorPlaceholderStyle: React.CSSProperties = {
@@ -681,7 +697,7 @@ const connectorPlaceholderStyle: React.CSSProperties = {
 const boxStyle: React.CSSProperties = {
   position: 'relative',
   margin: 0,
-  width: COLUMN_WIDTH - 64,
+  width: BOX_WIDTH,
   outline: 'none',
 }
 
