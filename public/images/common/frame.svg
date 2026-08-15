@@ -1,12 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- 9-slice frame. Slice at 16px: the four 16x16 corners (rounded L +
-       corner dot) stay fixed; the thin straight edges between them stretch. -->
-  <rect x="8" y="8" width="48" height="48" rx="4"
-        fill="none" stroke="#c4d3ff" stroke-opacity="0.55" stroke-width="1.5" />
-  <g fill="#c4d3ff">
-    <rect x="5" y="5" width="6" height="6" rx="1" />
-    <rect x="53" y="5" width="6" height="6" rx="1" />
-    <rect x="5" y="53" width="6" height="6" rx="1" />
-    <rect x="53" y="53" width="6" height="6" rx="1" />
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="64" height="64" viewBox="0 0 64 64">
+  <!--
+    ASSEMBLED 9-slice sheet (border-image source). Do NOT hand-edit the art
+    here: edit frame-corner.svg / frame-edge.svg and I will regenerate this.
+    slice = 16, so 0..16 and 48..64 are fixed corners and 16..48 repeats.
+
+    Each piece is defined once in defs, then placed via use with
+    "translate(target) rotate(angle,8,8)": rotate first (about the tile's own
+    center, in its original 16x16 coordinates), then translate into position.
+    Rotation cycle for a piece whose art hugs its TOP edge: 0=top, 90=right,
+    180=bottom, 270=left. That's why the corner (drawn hugging top+left)
+    becomes top+right at 90, bottom+right at 180, and bottom+left at 270,
+    while the edge (drawn hugging its top/outer side) keeps its accent lines
+    facing outward on every side once rotated the same way.
+  -->
+  <defs>
+    <g id="corner-art">
+      <polygon points="16,2 4,2 2,2 2,4 2,16 4,16 4,4 16,4" fill="#98B3E6" fill-opacity="0.7" />
+      <path d="M8.5,16c0,0-0.7-6,6.7-12H16c0,0-5.5,4.8-5.5,12" fill="#98B3E6" fill-opacity="0.7" />
+      <path d="M16,8.5c0,0-6-0.7-12,6.7V16c0,0,4.8-5.5,12-5.5" fill="#98B3E6" fill-opacity="0.7" />
+      <path d="M15.2,2h-2.9C6.6,2,2,6.6,2,12.2v2.9C2,7.9,7.9,2,15.2,2z" fill="#98B3E6" fill-opacity="0.7" />
+    </g>
+    <g id="edge-art">
+      <rect y="2" width="16" height="2" fill="#98B3E6" fill-opacity="0.7" />
+      <rect y="8.5" width="16" height="2" fill="#98B3E6" fill-opacity="0.7" />
+    </g>
+  </defs>
+
+  <!-- corners: top-left, top-right, bottom-right, bottom-left -->
+  <use href="#corner-art" xlink:href="#corner-art" transform="translate(0,0) rotate(0,8,8)" />
+  <use href="#corner-art" xlink:href="#corner-art" transform="translate(48,0) rotate(90,8,8)" />
+  <use href="#corner-art" xlink:href="#corner-art" transform="translate(48,48) rotate(180,8,8)" />
+  <use href="#corner-art" xlink:href="#corner-art" transform="translate(0,48) rotate(270,8,8)" />
+
+  <!-- edges: two tiles per side, rotated so the accent lines face outward -->
+  <use href="#edge-art" xlink:href="#edge-art" transform="translate(16,0) rotate(0,8,8)" />
+  <use href="#edge-art" xlink:href="#edge-art" transform="translate(32,0) rotate(0,8,8)" />
+  <use href="#edge-art" xlink:href="#edge-art" transform="translate(48,16) rotate(90,8,8)" />
+  <use href="#edge-art" xlink:href="#edge-art" transform="translate(48,32) rotate(90,8,8)" />
+  <use href="#edge-art" xlink:href="#edge-art" transform="translate(16,48) rotate(180,8,8)" />
+  <use href="#edge-art" xlink:href="#edge-art" transform="translate(32,48) rotate(180,8,8)" />
+  <use href="#edge-art" xlink:href="#edge-art" transform="translate(0,16) rotate(270,8,8)" />
+  <use href="#edge-art" xlink:href="#edge-art" transform="translate(0,32) rotate(270,8,8)" />
 </svg>

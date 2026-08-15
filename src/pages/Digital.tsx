@@ -3,10 +3,11 @@ import ArtworkTimeline, { CreditHighlight as Hi, type TimelineEvent } from '../c
 const BASE = import.meta.env.BASE_URL
 const CREDITS = (
   <>
-    <Hi>Drawabox (https://drawabox.com):</Hi> Where I first learned to draw.{' '}
-    <Hi>Proko (www.proko.com):</Hi> Figure drawing and one-off tutorials and inspiration.{' '}
-    <Hi>Jeremy Fenske (https://www.artstation.com/jandrew):</Hi> Thanks for the brushes.{' '}
-    <Hi>FromSoftware (https://www.fromsoftware.jp):</Hi> One of my biggest sources of inspiration, and where some of my own characters originated. Finally, the friends I sent my drawings to.
+    <Hi>Drawabox (drawabox.com):</Hi> Where I first learned to draw.{' '}
+    <Hi>Proko (proko.com):</Hi> Figure drawing fundamentals, anatomy, and one-off tutorials.{' '}
+    <Hi>Jeremy Fenske (artstation.com/jandrew):</Hi> Thanks for the brushes good sir.{' '}
+    <Hi>FromSoftware (fromsoftware.jp):</Hi> One of my biggest sources of inspiration, and where some of my own characters originated.{' '}
+    <Hi>Lastly,</Hi> the friends I sent my drawings to.
   </>
 )
 
@@ -56,7 +57,7 @@ const EVENTS: TimelineEvent[] = [
     id: 'faithchar_color',
     date: 'February 2026',
     title: 'Faith',
-    description: 'Both this and the next drawing originated as custom characters from Elden Ring.',
+    description: '☆ First portrait that\'s not of myself.',
     imageSrc: `${BASE}images/digital/faithchar_color.webp`,
     imageAlt: 'Faith',
   },
@@ -106,7 +107,9 @@ const ASSETS = {
       src: `${BASE}images/common/frame.svg`,
       slice: 16,
       width: 16,
-      repeat: 'stretch' as const,
+      // 'repeat' tiles the edge art at native size instead of stretching it,
+      // so the accent lines keep their exact thickness on every piece.
+      repeat: 'repeat' as const,
     },
   },
 }

@@ -66,10 +66,8 @@ export default function Home() {
   I'm currently a rising junior at UCLA studying Computer Science, with a focus on machine learning and NLP. I am also a Kleiner Perkins Engineering Fellow and an officer for ACM ICPC at UCLA.
   <br />
   <br />
-    Outside of my studies and coding up weird things (see Projects), I cook, gym, and draw. Do check out the Artwork page for my creations.
-    <br />
-    <br />
-    They also call me Jchen, JCProject, noobstin, a menace, and "dude this guy".
+    Outside of my studies, research projects, and hackathon things (see Projects), I cook, gym, and draw. Do stop by the Artwork page for my creations.
+    
     <br />
     <br />
     ! More stuff is coming at a later date, including my whiteboard drawings, and maybe another self portrait !

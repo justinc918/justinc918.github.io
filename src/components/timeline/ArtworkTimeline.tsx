@@ -28,11 +28,21 @@ export type TimelineBoxBorder = {
   slice: number | [number, number, number, number]
   /** On-screen thickness of the border. Defaults to `slice` (single-number form). */
   width?: number
-  /** How the straight edge slices fill the gap between corners. */
-  repeat?: 'stretch' | 'repeat' | 'round'
+  /**
+   * How the straight edge tile fills the gap between corners along its length
+   * (the cross-axis thickness is always fixed at `width`, never scaled):
+   *   - 'stretch': uniformly rescales the tile to fit — warps any pattern.
+   *   - 'repeat':  tiles the source at native size, clipping the last copy.
+   *   - 'round':   tiles at (near-)native size so a whole number always fits.
+   * Pass a tuple to control axes independently, per the CSS spec order:
+   * [top & bottom edges, left & right edges].
+   */
+  repeat?: BorderRepeatMode | [BorderRepeatMode, BorderRepeatMode]
   /** How far (px) the frame sits outside the image edge. Defaults to 0. */
   outset?: number
 }
+
+export type BorderRepeatMode = 'stretch' | 'repeat' | 'round'
 
 // Asset slots are grouped by type so each visual layer can be swapped for a
 // custom SVG later without touching layout logic. Any slot left undefined falls
@@ -646,7 +656,9 @@ const frameWrapStyle = (
       borderImageSource: `url(${border.src})`,
       borderImageSlice: sliceValue,
       borderImageWidth: `${width}px`,
-      borderImageRepeat: border.repeat ?? 'stretch',
+      borderImageRepeat: Array.isArray(border.repeat)
+        ? border.repeat.join(' ')
+        : border.repeat ?? 'stretch',
       borderImageOutset: `${(border.outset ?? 0) * scale}px`,
     }
   }
