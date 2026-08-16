@@ -1,6 +1,7 @@
 const BASE = import.meta.env.BASE_URL
 const VERTICAL = `${BASE}images/common/vertical.svg`
 const ME = `${BASE}images/other/me.png`
+const EMAIL_ICON = `${BASE}images/other/email.svg`
 
 const ICON_COLOR = '#c4d3ff'
 
@@ -24,6 +25,10 @@ function LinkedInIcon() {
   )
 }
 
+function EmailIcon() {
+  return <img src={EMAIL_ICON} alt="" width={30} height={30} style={{ display: 'block' }} aria-hidden="true" />
+}
+
 type LinkItem = {
   label: string
   href: string
@@ -33,6 +38,7 @@ type LinkItem = {
 const LINKS: LinkItem[] = [
   { label: 'GitHub', href: 'https://github.com/justinc918', Icon: GitHubIcon },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/justin-chen-79256432b/', Icon: LinkedInIcon },
+  { label: 'Email', href: 'mailto:justinc918@g.ucla.edu', Icon: EmailIcon },
 ]
 
 export default function Home() {
@@ -42,23 +48,26 @@ export default function Home() {
         <div style={leftColumnStyle}>
           <img src={ME} alt="Justin" style={profileImageStyle} />
           <div style={linksStyle}>
-            {LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={link.label}
-                style={linkStyle}
-              >
-                <link.Icon />
-              </a>
-            ))}
+            {LINKS.map((link) => {
+              const isMail = link.href.startsWith('mailto:')
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target={isMail ? undefined : '_blank'}
+                  rel={isMail ? undefined : 'noopener noreferrer'}
+                  aria-label={link.label}
+                  style={linkStyle}
+                >
+                  <link.Icon />
+                </a>
+              )
+            })}
           </div>
         </div>
         <img src={VERTICAL} alt="" aria-hidden="true" style={dividerStyle} />
         <div style={rightColumnStyle}>
-          <h1 style={nameStyle}>Hi, I'm Justin</h1>
+          <h1 style={nameStyle}>Hello, I'm Justin</h1>
           <p style={descriptionStyle}>
   I'm currently a rising junior at UCLA studying Computer Science, with a focus on machine learning and NLP. I am also a Kleiner Perkins Engineering Fellow and an officer for ACM ICPC at UCLA.
   <br />
