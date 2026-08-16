@@ -112,6 +112,7 @@ const ASSETS = {
     marker: `${BASE}images/timeline/point/marker.svg`,
   },
   scrollbar: {
+    track: `${BASE}images/timeline/scrollbar/track.svg`,
     thumb: `${BASE}images/timeline/scrollbar/thumb.svg`,
   },
   box: {

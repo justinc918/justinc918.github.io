@@ -59,6 +59,12 @@ export type TimelineAssets = {
   }
   scrollbar?: {
     /**
+     * Back-line (track) art. A single self-contained image stretched across the
+     * whole scrollbar width, so an SVG should carry preserveAspectRatio="none".
+     * Falls back to a thin CSS line when omitted.
+     */
+    track?: string
+    /**
      * Draggable thumb art. Stretched to the thumb's on-screen box, so an SVG
      * should carry preserveAspectRatio="none" if it shouldn't distort-lock.
      * Falls back to a CSS placeholder rectangle when omitted.
@@ -110,8 +116,8 @@ const LIGHTBOX_FRAME_SCALE = 2.6 // enlarges the frame's fixed corners in the po
 
 // Custom bottom scrollbar. The track reuses the timeline's line segment art,
 // tiled at a shrunken size and 50% opacity; the thumb is a swappable rectangle.
-const SCROLLBAR_HEIGHT = 14 // thumb (and track) on-screen thickness
-const SCROLLBAR_TRACK_SEGMENT_HEIGHT = 8 // "shrunken" segment tile height in the track
+const SCROLLBAR_HEIGHT = 14 // thumb on-screen thickness
+const SCROLLBAR_TRACK_HEIGHT = 8 // back-line on-screen thickness
 const SCROLLBAR_MIN_THUMB = 56 // keep the thumb grabbable even on huge timelines
 const SCROLLBAR_BOTTOM_INSET = 22 // gap from the viewport bottom edge
 const SCROLL_CLASS = 'artwork-timeline-scroll'
@@ -190,7 +196,7 @@ export default function ArtworkTimeline({ events, assets, credits }: TimelinePro
       </div>
       <TimelineScrollbar
         scrollRef={scrollRef}
-        trackSegment={assets?.line?.segment}
+        track={assets?.scrollbar?.track}
         thumb={assets?.scrollbar?.thumb}
       />
     </div>
@@ -203,11 +209,11 @@ export default function ArtworkTimeline({ events, assets, credits }: TimelinePro
 
 function TimelineScrollbar({
   scrollRef,
-  trackSegment,
+  track,
   thumb,
 }: {
   scrollRef: React.RefObject<HTMLDivElement | null>
-  trackSegment?: string
+  track?: string
   thumb?: string
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
@@ -284,12 +290,11 @@ function TimelineScrollbar({
       onPointerDown={onTrackPointerDown}
       aria-hidden={!geo.scrollable}
     >
-      <div
-        style={{
-          ...scrollbarTrackStyle,
-          backgroundImage: trackSegment ? `url(${trackSegment})` : undefined,
-        }}
-      />
+      {track ? (
+        <img src={track} alt="" aria-hidden="true" style={scrollbarTrackImageStyle} />
+      ) : (
+        <div style={scrollbarTrackFallbackStyle} />
+      )}
       <div
         style={{ ...scrollbarThumbStyle, left: geo.left, width: geo.width }}
         onPointerDown={(e) => {
@@ -714,17 +719,29 @@ const scrollbarWrapStyle: React.CSSProperties = {
   transition: 'opacity 200ms ease',
 }
 
-const scrollbarTrackStyle: React.CSSProperties = {
+// Single-image back line stretched across the full scrollbar width at half
+// strength for a subtle rail.
+const scrollbarTrackImageStyle: React.CSSProperties = {
   position: 'absolute',
   left: 0,
   right: 0,
   top: '50%',
   transform: 'translateY(-50%)',
-  height: SCROLLBAR_HEIGHT,
-  // Tile the shrunken segment horizontally at half strength for a subtle rail.
-  backgroundRepeat: 'repeat-x',
-  backgroundPosition: 'center',
-  backgroundSize: `auto ${SCROLLBAR_TRACK_SEGMENT_HEIGHT}px`,
+  width: '100%',
+  height: SCROLLBAR_TRACK_HEIGHT,
+  opacity: 0.5,
+  pointerEvents: 'none',
+}
+
+const scrollbarTrackFallbackStyle: React.CSSProperties = {
+  position: 'absolute',
+  left: 0,
+  right: 0,
+  top: '50%',
+  transform: 'translateY(-50%)',
+  height: 2,
+  borderRadius: 1,
+  backgroundColor: LINE_COLOR,
   opacity: 0.5,
   pointerEvents: 'none',
 }

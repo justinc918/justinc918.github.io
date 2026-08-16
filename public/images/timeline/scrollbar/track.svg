@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Scrollbar back-line (track) placeholder.
+  - Single self-contained file: it's loaded once and stretched across the whole
+    scrollbar width (unlike the timeline segment, which tiles smaller pieces).
+  - preserveAspectRatio="none" lets this stretch to any width/height without
+    letterboxing, so replace the <rect> with your own single-piece line art later.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 4" preserveAspectRatio="none">
+  <rect x="0" y="1" width="100" height="2" rx="1" ry="1" fill="#ccd8ff" />
+</svg>
