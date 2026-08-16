@@ -57,6 +57,14 @@ export type TimelineAssets = {
   point?: {
     marker?: string
   }
+  scrollbar?: {
+    /**
+     * Draggable thumb art. Stretched to the thumb's on-screen box, so an SVG
+     * should carry preserveAspectRatio="none" if it shouldn't distort-lock.
+     * Falls back to a CSS placeholder rectangle when omitted.
+     */
+    thumb?: string
+  }
   box?: {
     /** 9-slice frame that dynamically hugs the image. Preferred. */
     border?: TimelineBoxBorder
@@ -100,6 +108,14 @@ const CAPTION_WIDTH = 190 // caption sits to the left of the image
 const START_PADDING = 240 // extra room so the first piece's caption fits
 const LIGHTBOX_FRAME_SCALE = 2.6 // enlarges the frame's fixed corners in the popup
 
+// Custom bottom scrollbar. The track reuses the timeline's line segment art,
+// tiled at a shrunken size and 50% opacity; the thumb is a swappable rectangle.
+const SCROLLBAR_HEIGHT = 14 // thumb (and track) on-screen thickness
+const SCROLLBAR_TRACK_SEGMENT_HEIGHT = 8 // "shrunken" segment tile height in the track
+const SCROLLBAR_MIN_THUMB = 56 // keep the thumb grabbable even on huge timelines
+const SCROLLBAR_BOTTOM_INSET = 22 // gap from the viewport bottom edge
+const SCROLL_CLASS = 'artwork-timeline-scroll'
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Timeline
 // ─────────────────────────────────────────────────────────────────────────────
@@ -114,42 +130,182 @@ export default function ArtworkTimeline({ events, assets, credits }: TimelinePro
     if (scrollRef.current) scrollRef.current.scrollLeft = 0
   }, [events])
 
+  // Translate a plain vertical mouse wheel into horizontal scrolling so mouse
+  // users (who have no horizontal wheel) can move through the timeline. A
+  // native non-passive listener is required because React's onWheel is passive
+  // and can't call preventDefault. Trackpad horizontal gestures (deltaX) are
+  // left untouched so two-axis input still feels natural.
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const onWheel = (e: WheelEvent) => {
+      if (el.scrollWidth <= el.clientWidth) return // nothing to scroll sideways
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return // real horizontal intent
+      if (e.deltaY === 0) return
+      el.scrollLeft += e.deltaY
+      e.preventDefault()
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [])
+
   return (
-    <div ref={scrollRef} style={scrollStyle}>
-      <div style={contentStyle}>
-        <div style={trackStyle}>
-          {events.map((event, index) => {
-            const above = index % 2 === 0
-            const isFirst = index === 0
-            const isLast = index === events.length - 1
-            return (
-              <TimelineColumn
-                key={event.id}
-                event={event}
-                above={above}
-                isFirst={isFirst}
-                isLast={isLast}
-                assets={assets}
-                onOpen={setActiveEvent}
-              />
-            )
-          })}
-        </div>
-        {credits && (
-          <div style={creditsRowStyle}>
-            <p style={creditsTextStyle}>
-              <strong style={creditsLabelStyle}>Credits</strong> {credits}
-            </p>
+    <div style={rootStyle}>
+      <style>{scrollbarHideCss}</style>
+      <div ref={scrollRef} className={SCROLL_CLASS} style={scrollStyle}>
+        <div style={contentStyle}>
+          <div style={trackStyle}>
+            {events.map((event, index) => {
+              const above = index % 2 === 0
+              const isFirst = index === 0
+              const isLast = index === events.length - 1
+              return (
+                <TimelineColumn
+                  key={event.id}
+                  event={event}
+                  above={above}
+                  isFirst={isFirst}
+                  isLast={isLast}
+                  assets={assets}
+                  onOpen={setActiveEvent}
+                />
+              )
+            })}
           </div>
+          {credits && (
+            <div style={creditsRowStyle}>
+              <p style={creditsTextStyle}>
+                <strong style={creditsLabelStyle}>Credits</strong> {credits}
+              </p>
+            </div>
+          )}
+        </div>
+        {activeEvent && (
+          <TimelineLightbox
+            event={activeEvent}
+            box={assets?.box}
+            onClose={() => setActiveEvent(null)}
+          />
         )}
       </div>
-      {activeEvent && (
-        <TimelineLightbox
-          event={activeEvent}
-          box={assets?.box}
-          onClose={() => setActiveEvent(null)}
-        />
-      )}
+      <TimelineScrollbar
+        scrollRef={scrollRef}
+        trackSegment={assets?.line?.segment}
+        thumb={assets?.scrollbar?.thumb}
+      />
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Scrollbar module (custom, draggable, pinned to the viewport bottom)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function TimelineScrollbar({
+  scrollRef,
+  trackSegment,
+  thumb,
+}: {
+  scrollRef: React.RefObject<HTMLDivElement | null>
+  trackSegment?: string
+  thumb?: string
+}) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  // Pixel geometry of the thumb, recomputed on scroll/resize so the bar mirrors
+  // the scroll container exactly.
+  const [geo, setGeo] = useState({ left: 0, width: 0, scrollable: false })
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const update = () => {
+      const max = el.scrollWidth - el.clientWidth
+      const trackWidth = trackRef.current?.clientWidth ?? 0
+      const ratio = el.scrollWidth > 0 ? el.clientWidth / el.scrollWidth : 1
+      const width = Math.max(trackWidth * ratio, SCROLLBAR_MIN_THUMB)
+      const progress = max > 0 ? el.scrollLeft / max : 0
+      const left = Math.max(0, (trackWidth - width) * progress)
+      setGeo({ left, width, scrollable: max > 1 })
+    }
+    update()
+    el.addEventListener('scroll', update, { passive: true })
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    if (trackRef.current) ro.observe(trackRef.current)
+    window.addEventListener('resize', update)
+    return () => {
+      el.removeEventListener('scroll', update)
+      ro.disconnect()
+      window.removeEventListener('resize', update)
+    }
+  }, [scrollRef])
+
+  // Drag the thumb: map horizontal pointer movement across the usable track
+  // range onto the container's scrollable range.
+  const onThumbPointerDown = (e: React.PointerEvent) => {
+    const el = scrollRef.current
+    const track = trackRef.current
+    if (!el || !track) return
+    e.preventDefault()
+    const startX = e.clientX
+    const startScroll = el.scrollLeft
+    const max = el.scrollWidth - el.clientWidth
+    const usable = track.clientWidth - geo.width
+    const onMove = (ev: PointerEvent) => {
+      if (usable <= 0) return
+      const delta = ((ev.clientX - startX) / usable) * max
+      el.scrollLeft = startScroll + delta
+    }
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
+
+  // Click anywhere on the track to jump the thumb's center to that point.
+  const onTrackPointerDown = (e: React.PointerEvent) => {
+    const el = scrollRef.current
+    const track = trackRef.current
+    if (!el || !track) return
+    const rect = track.getBoundingClientRect()
+    const max = el.scrollWidth - el.clientWidth
+    const usable = track.clientWidth - geo.width
+    if (usable <= 0) return
+    const target = e.clientX - rect.left - geo.width / 2
+    el.scrollLeft = (Math.min(Math.max(target, 0), usable) / usable) * max
+  }
+
+  return (
+    <div
+      ref={trackRef}
+      style={{ ...scrollbarWrapStyle, opacity: geo.scrollable ? 1 : 0 }}
+      onPointerDown={onTrackPointerDown}
+      aria-hidden={!geo.scrollable}
+    >
+      <div
+        style={{
+          ...scrollbarTrackStyle,
+          backgroundImage: trackSegment ? `url(${trackSegment})` : undefined,
+        }}
+      />
+      <div
+        style={{ ...scrollbarThumbStyle, left: geo.left, width: geo.width }}
+        onPointerDown={(e) => {
+          e.stopPropagation()
+          onThumbPointerDown(e)
+        }}
+        role="scrollbar"
+        aria-orientation="horizontal"
+        tabIndex={0}
+      >
+        {thumb ? (
+          <img src={thumb} alt="" aria-hidden="true" style={scrollbarThumbImageStyle} />
+        ) : (
+          <div style={scrollbarThumbPlaceholderStyle} />
+        )}
+      </div>
     </div>
   )
 }
@@ -522,6 +678,14 @@ function TimelineLightbox({
 // Styles
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Holds the scroll region plus the overlaid custom scrollbar. The scrollbar
+// lives OUTSIDE the scrolling element so it stays pinned while content pans.
+const rootStyle: React.CSSProperties = {
+  position: 'relative',
+  width: '100%',
+  height: '100%',
+}
+
 const scrollStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
@@ -529,15 +693,76 @@ const scrollStyle: React.CSSProperties = {
   overflowY: 'hidden',
 }
 
+// The custom scrollbar replaces the native one, so hide the native bar (which
+// macOS hides until scrolling anyway, and which would otherwise double up).
+const scrollbarHideCss = `
+  .${SCROLL_CLASS} { scrollbar-width: none; -ms-overflow-style: none; }
+  .${SCROLL_CLASS}::-webkit-scrollbar { display: none; }
+`
+
+const scrollbarWrapStyle: React.CSSProperties = {
+  position: 'absolute',
+  left: '50%',
+  bottom: SCROLLBAR_BOTTOM_INSET,
+  width: '50%',
+  transform: 'translateX(-50%)',
+  height: SCROLLBAR_HEIGHT,
+  display: 'flex',
+  alignItems: 'center',
+  cursor: 'pointer',
+  zIndex: 5,
+  transition: 'opacity 200ms ease',
+}
+
+const scrollbarTrackStyle: React.CSSProperties = {
+  position: 'absolute',
+  left: 0,
+  right: 0,
+  top: '50%',
+  transform: 'translateY(-50%)',
+  height: SCROLLBAR_HEIGHT,
+  // Tile the shrunken segment horizontally at half strength for a subtle rail.
+  backgroundRepeat: 'repeat-x',
+  backgroundPosition: 'center',
+  backgroundSize: `auto ${SCROLLBAR_TRACK_SEGMENT_HEIGHT}px`,
+  opacity: 0.5,
+  pointerEvents: 'none',
+}
+
+const scrollbarThumbStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  height: SCROLLBAR_HEIGHT,
+  cursor: 'grab',
+  touchAction: 'none',
+  outline: 'none',
+}
+
+const scrollbarThumbImageStyle: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
+  height: '100%',
+}
+
+const scrollbarThumbPlaceholderStyle: React.CSSProperties = {
+  width: '100%',
+  height: '100%',
+  borderRadius: SCROLLBAR_HEIGHT / 2,
+  backgroundColor: ACCENT,
+}
+
 // Stacks the timeline track and the credits line into one vertically-centered
 // column whose width is driven by the track, so both share a single horizontal
-// scroll region.
+// scroll region. The bottom padding reserves the strip the custom scrollbar
+// floats over, so the credits (the last row) land just above the bar.
 const contentStyle: React.CSSProperties = {
   minWidth: 'min-content',
   minHeight: '100%',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
+  paddingBottom: SCROLLBAR_BOTTOM_INSET + SCROLLBAR_HEIGHT + 14,
 }
 
 const trackStyle: React.CSSProperties = {
@@ -551,7 +776,7 @@ const trackStyle: React.CSSProperties = {
 
 const creditsRowStyle: React.CSSProperties = {
   minWidth: 'min-content',
-  padding: `0 64px 20px ${START_PADDING}px`,
+  padding: `0 64px 0 ${START_PADDING}px`,
   marginTop: 8,
 }
 

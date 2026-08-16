@@ -1,2 +1,3 @@
-# personal-site
-Personal site intended to be deployed on Github Pages
+# justinc918.github.io
+
+my website :-)
