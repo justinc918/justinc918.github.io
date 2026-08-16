@@ -24,7 +24,7 @@ const EVENTS: TimelineEvent[] = [
   {
     id: 'first_color',
     date: 'May 2025',
-    title: 'First Color',
+    title: '',
     description: '☆ First human I drew with color.',
     imageSrc: `${BASE}images/digital/first_color.webp`,
     imageAlt: 'First Color',

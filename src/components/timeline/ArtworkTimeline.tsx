@@ -252,7 +252,7 @@ function TimelineLine({
         <LineSegment asset={asset} width="100%" />
       )}
       {showStartCap && (
-        <div style={{ ...capStyle, left: 0 }}>
+        <div style={{ ...capStyle, left: 0, transform: startCap ? startCapTransform : capStyle.transform }}>
           {startCap ? (
             <img src={startCap} alt="" aria-hidden="true" style={capImageStyle} />
           ) : (
@@ -625,6 +625,15 @@ const capImageStyle: React.CSSProperties = {
   height: 12,
   width: 'auto',
 }
+
+// The start-cap art's nose tip (its visual "end", the point that should meet
+// the line) sits at ~92.2% of the image's own width rather than at its right
+// edge, because the source SVG carries a little empty margin past the tip.
+// Shifting left by that fraction of its own rendered width (a %, so it holds
+// regardless of the fixed 12px render height) lands the tip exactly on the
+// line's start instead of the image's left edge, so the head trails off to
+// the left of the line rather than overlapping it.
+const startCapTransform = 'translate(-92.24%, -50%)'
 
 const capPlaceholderStyle: React.CSSProperties = {
   width: 0,
