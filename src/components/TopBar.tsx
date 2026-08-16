@@ -4,6 +4,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 const BASE = import.meta.env.BASE_URL
 const RESUME_URL = `${BASE}files/JustinChenResumeF.pdf`
 const SMALL_HORIZ = `${BASE}images/common/small_horiz.svg`
+const LOGO = `${BASE}images/common/logo.png`
 
 const navLinkStyle = ({ isActive }: { isActive: boolean }): React.CSSProperties => ({
   color: isActive ? '#c4d3ff' : 'rgba(196,211,255,0.75)',
@@ -80,11 +81,15 @@ export default function TopBar() {
   }
 
   return (
-    <nav
-      ref={navRef}
-      style={barStyle}
-      onMouseLeave={() => moveTo(activeIndex)}
-    >
+    <div style={barWrapperStyle}>
+      <NavLink to="/" end style={logoLinkStyle} aria-label="Home">
+        <img src={LOGO} alt="" style={logoStyle} />
+      </NavLink>
+      <nav
+        ref={navRef}
+        style={barStyle}
+        onMouseLeave={() => moveTo(activeIndex)}
+      >
       <img
         src={SMALL_HORIZ}
         alt=""
@@ -141,7 +146,8 @@ export default function TopBar() {
       >
         Resume
       </a>
-    </nav>
+      </nav>
+    </div>
   )
 }
 
@@ -162,15 +168,39 @@ const indicatorStyle: React.CSSProperties = {
   willChange: 'transform, width',
 }
 
+const barWrapperStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '14px 28px',
+  flexShrink: 0,
+  position: 'relative',
+  zIndex: 200,
+}
+
+const logoLinkStyle: React.CSSProperties = {
+  position: 'absolute',
+  left: 28,
+  top: '50%',
+  transform: 'translateY(-50%)',
+  display: 'flex',
+  alignItems: 'center',
+  textDecoration: 'none',
+}
+
+const logoStyle: React.CSSProperties = {
+  height: 32,
+  width: 'auto',
+  display: 'block',
+}
+
 const barStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   gap: 56,
-  padding: '14px 28px',
+  width: '100%',
   background: 'transparent',
-  flexShrink: 0,
   position: 'relative',
-  zIndex: 200,
   textTransform: 'uppercase',
 }
