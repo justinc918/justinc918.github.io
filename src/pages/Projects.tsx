@@ -2,9 +2,6 @@ const BASE = import.meta.env.BASE_URL
 const LONG_HORIZ = `${BASE}images/common/long_horiz.svg`
 const VIETCONG = `${BASE}images/other/vietcong.png`
 
-const LOREM =
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.'
-
 const ICON_COLOR = '#c4d3ff'
 
 function GitHubIcon() {

@@ -33,7 +33,7 @@ const EVENTS: TimelineEvent[] = [
     id: 'asdfja',
     date: 'June 2025',
     title: '',
-    description: '☆ First fanart. Also first drawing I am pretty embarrassed about :/.',
+    description: 'At the time, I was exploring different styles for digital art. This one didn\'t click.',
     imageSrc: `${BASE}images/digital/asdfja.webp`,
     imageAlt: 'Asdfja',
   },
@@ -49,7 +49,7 @@ const EVENTS: TimelineEvent[] = [
     id: 'nightfarers',
     date: 'December 2025',
     title: 'Nightfarers as the Night\'s Watch',
-    description: '☆ Longest I\'ve spent on any drawing (30 hours).',
+    description: '☆ Longest I\'ve spent on any drawing (30+ hours).',
     imageSrc: `${BASE}images/digital/nightfarers.webp`,
     imageAlt: 'Nightfarers',
   },
@@ -72,7 +72,7 @@ const EVENTS: TimelineEvent[] = [
     id: 'harmonia_study',
     date: 'March 2026',
     title: 'Flowers Study',
-    description: 'I drew this entirely during a Big ACM meeting. This was also a study for a certain whiteboard piece.',
+    description: 'I drew this entirely during a Big ACM club meeting. This was also a study for a certain whiteboard piece.',
     imageSrc: `${BASE}images/digital/Harmonia_study.webp`,
     imageAlt: 'Harmonia Study',
   },
@@ -116,10 +116,6 @@ const ASSETS = {
       src: `${BASE}images/common/frame.svg`,
       slice: 16,
       width: 16,
-      // The edge art is just straight lines running along each side, so we
-      // 'stretch' rather than tile it. Stretching a straight line lengthwise
-      // looks identical but has no tile boundaries, so no hairline gaps open
-      // up between segments when the frame is scaled on hover.
       repeat: 'stretch' as const,
     },
   },

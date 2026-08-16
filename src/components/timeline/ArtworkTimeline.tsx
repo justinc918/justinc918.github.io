@@ -62,6 +62,12 @@ export type TimelineAssets = {
     border?: TimelineBoxBorder
     /** Legacy single-image frame stretched over the image bounds. */
     frame?: string
+    /**
+     * Square backdrop drawn behind the image (and frame). Treated as a
+     * 1000x1000px source that's non-uniformly stretched to match each
+     * image's own rendered dimensions, same as the frame does.
+     */
+    backdrop?: string
   }
 }
 
@@ -379,6 +385,7 @@ function TimelineBox({
   const [hovered, setHovered] = useState(false)
   const border = box?.border
   const frame = box?.frame
+  const backdrop = box?.backdrop
   const canOpen = Boolean(event.imageSrc)
 
   const handleOpen = () => {
@@ -415,6 +422,9 @@ function TimelineBox({
             whatever border it carries hugs the picture rather than the 4:3
             media box. Border priority: 9-slice > legacy frame > placeholder. */}
         <div style={frameWrapStyle(hovered, border)}>
+          {backdrop && (
+            <img src={backdrop} alt="" aria-hidden="true" style={backdropStyle(border)} />
+          )}
           {frame && !border && (
             <img src={frame} alt="" aria-hidden="true" style={legacyFrameStyle} />
           )}
@@ -446,6 +456,7 @@ function TimelineLightbox({
 }) {
   const border = box?.border
   const frame = box?.frame
+  const backdrop = box?.backdrop
 
   // Close on Escape and lock background scroll while the popup is open.
   useEffect(() => {
@@ -473,6 +484,14 @@ function TimelineLightbox({
       {/* Stop propagation so clicks on the artwork itself don't close the popup. */}
       <figure style={lightboxFigureStyle} onClick={(e) => e.stopPropagation()}>
         <div style={{ ...frameWrapStyle(false, border, LIGHTBOX_FRAME_SCALE), height: 'auto' }}>
+          {backdrop && (
+            <img
+              src={backdrop}
+              alt=""
+              aria-hidden="true"
+              style={backdropStyle(border, LIGHTBOX_FRAME_SCALE)}
+            />
+          )}
           {frame && !border && (
             <img src={frame} alt="" aria-hidden="true" style={legacyFrameStyle} />
           )}
@@ -784,6 +803,33 @@ const legacyFrameStyle: React.CSSProperties = {
   height: '100%',
   pointerEvents: 'none',
   zIndex: 1,
+}
+
+// Square backdrop drawn behind the image AND the frame. `inset: 0` alone would
+// only cover the content box (the image itself), leaving it invisible behind
+// any transparent gaps in the frame's border art or outset — so when a 9-slice
+// border is present, this expands outward by the border's on-screen width
+// (plus outset) to also fill the area the frame sits over. It's stretched
+// non-uniformly (no object-fit, sides pinned rather than width/height set) so
+// the 1000x1000 source always fills the box exactly regardless of distortion.
+// A negative z-index is required (not just a lower one) because the artwork
+// <img> itself is unpositioned — per the stacking spec, positioned descendants
+// always paint above static in-flow content unless they carry a negative
+// stack level.
+const backdropStyle = (border?: TimelineBoxBorder, scale = 1): React.CSSProperties => {
+  const base: React.CSSProperties = {
+    position: 'absolute',
+    pointerEvents: 'none',
+    zIndex: -1,
+  }
+
+  if (border) {
+    const baseWidth = border.width ?? (Array.isArray(border.slice) ? border.slice[0] : border.slice)
+    const expand = baseWidth * scale + (border.outset ?? 0) * scale
+    return { ...base, top: -expand, right: -expand, bottom: -expand, left: -expand }
+  }
+
+  return { ...base, inset: 0, width: '100%', height: '100%' }
 }
 
 // Match the box height and preserve the image's native proportions; width
