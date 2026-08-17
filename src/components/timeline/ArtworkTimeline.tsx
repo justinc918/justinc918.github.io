@@ -672,9 +672,6 @@ function TimelineLightbox({
           </figcaption>
         )}
       </figure>
-      <button type="button" style={lightboxCloseStyle} onClick={onClose} aria-label="Close">
-        ×
-      </button>
     </div>
   )
 }
@@ -1189,20 +1186,3 @@ const lightboxCaptionStyle: React.CSSProperties = {
   maxWidth: 620,
 }
 
-const lightboxCloseStyle: React.CSSProperties = {
-  position: 'fixed',
-  top: 20,
-  right: 24,
-  width: 44,
-  height: 44,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 28,
-  lineHeight: 1,
-  color: ACCENT,
-  background: 'rgba(196,211,255,0.08)',
-  border: `1px solid ${FAINT}`,
-  borderRadius: '50%',
-  cursor: 'pointer',
-}
