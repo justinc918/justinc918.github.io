@@ -3,11 +3,11 @@ import ArtworkTimeline, { CreditHighlight as Hi, type TimelineEvent } from '../c
 const BASE = import.meta.env.BASE_URL
 const CREDITS = (
   <>
-    <Hi>Drawabox (drawabox.com):</Hi> Where I first learned to draw.{' '}
-    <Hi>Proko (proko.com):</Hi> Figure drawing fundamentals, anatomy, and one-off tutorials.{' '}
-    <Hi>Jeremy Fenske (artstation.com/jandrew):</Hi> Thanks for the brushes good sir.{' '}
-    <Hi>FromSoftware (fromsoftware.jp):</Hi> One of my biggest sources of inspiration, and where some of my own characters originated.{' '}
-    <Hi>Lastly,</Hi> the friends I sent my drawings to.
+    <Hi>Drawabox (drawabox.com):</Hi> Where it all started; where I first learned to draw |{' '}
+    <Hi>Proko (proko.com):</Hi> Figure drawing fundamentals, anatomy, and one-off tutorials |{' '}
+    <Hi>Jeremy Fenske (artstation.com/jandrew):</Hi> Thanks for the brushes good sir |{' '}
+    <Hi>FromSoftware (fromsoftware.jp):</Hi> One of my biggest sources of inspiration for character design |{' '}
+    <Hi>Lastly,</Hi> the friends I sent my drawings to who gave me useful feedback.
   </>
 )
 

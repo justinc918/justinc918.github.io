@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type TimelineEvent = {
   id: string
@@ -91,9 +89,7 @@ type TimelineProps = {
   credits?: React.ReactNode
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Tokens
-// ─────────────────────────────────────────────────────────────────────────────
 
 const LINE_COLOR = '#ccd8ff'
 const ACCENT = '#c4d3ff'
@@ -122,9 +118,7 @@ const SCROLLBAR_MIN_THUMB = 56 // keep the thumb grabbable even on huge timeline
 const SCROLLBAR_BOTTOM_INSET = 22 // gap from the viewport bottom edge
 const SCROLL_CLASS = 'artwork-timeline-scroll'
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Timeline
-// ─────────────────────────────────────────────────────────────────────────────
 
 export default function ArtworkTimeline({ events, assets, credits }: TimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -203,9 +197,7 @@ export default function ArtworkTimeline({ events, assets, credits }: TimelinePro
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Scrollbar module (custom, draggable, pinned to the viewport bottom)
-// ─────────────────────────────────────────────────────────────────────────────
+// Scrollbar (custom, draggable, pinned to the viewport bottom)
 
 function TimelineScrollbar({
   scrollRef,
@@ -315,9 +307,7 @@ function TimelineScrollbar({
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Column: one event = line segment + point + connector + box
-// ─────────────────────────────────────────────────────────────────────────────
 
 type ColumnProps = {
   event: TimelineEvent
@@ -380,9 +370,7 @@ function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen }: Colum
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Line module
-// ─────────────────────────────────────────────────────────────────────────────
+// Line
 
 type LineProps = {
   asset?: string
@@ -487,9 +475,7 @@ function LineSegment({
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Point module
-// ─────────────────────────────────────────────────────────────────────────────
+// Point
 
 function TimelinePoint({ asset }: { asset?: string }) {
   return (
@@ -503,9 +489,7 @@ function TimelinePoint({ asset }: { asset?: string }) {
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Connector module (vertical stem between line and box)
-// ─────────────────────────────────────────────────────────────────────────────
+// Connector (vertical stem between line and box)
 
 function TimelineConnector({
   asset,
@@ -530,9 +514,7 @@ function TimelineConnector({
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Box module (artwork card)
-// ─────────────────────────────────────────────────────────────────────────────
+// Box (artwork card)
 
 function TimelineBox({
   event,
@@ -602,9 +584,7 @@ function TimelineBox({
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Lightbox module (fullscreen expanded artwork)
-// ─────────────────────────────────────────────────────────────────────────────
+// Lightbox (fullscreen expanded artwork)
 
 function TimelineLightbox({
   event,
@@ -676,12 +656,10 @@ function TimelineLightbox({
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Styles
-// ─────────────────────────────────────────────────────────────────────────────
 
-// Holds the scroll region plus the overlaid custom scrollbar. The scrollbar
-// lives OUTSIDE the scrolling element so it stays pinned while content pans.
+// The scrollbar lives outside the scrolling element so it stays pinned while
+// content pans.
 const rootStyle: React.CSSProperties = {
   position: 'relative',
   width: '100%',
