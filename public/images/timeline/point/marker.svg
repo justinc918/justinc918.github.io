@@ -4,11 +4,17 @@
 	 viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
 <style type="text/css">
 	.st0{fill:#C4D3FF;fill-opacity:0.15;}
-	.st1{fill:#FFFFFF;fill-opacity:0.15;}
-	.st2{fill:none;stroke:#C4D3FF;stroke-width:0.5;stroke-miterlimit:10;}
+	.st1{fill:none;stroke:#E0E8FF;stroke-width:0.5;stroke-miterlimit:9.9999;}
+	.st2{fill:#E0E8FF;}
 </style>
 <circle class="st0" cx="11" cy="11" r="11"/>
-<rect x="6.7" y="6.7" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.5563 11)" class="st1" width="8.6" height="8.6"/>
-<rect x="3.5" y="3.5" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.5563 11)" class="st2" width="15" height="15"/>
-<rect x="4.7" y="4.7" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.5563 11)" class="st2" width="12.7" height="12.7"/>
+<rect x="3.5" y="3.5" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -4.5512 11.0124)" class="st1" width="15" height="15"/>
+<path class="st2" d="M13.2,19.1L2.9,13.2L8.8,2.9l10.3,5.9L13.2,19.1z M3.5,13l9.5,5.5L18.5,9L9,3.5L3.5,13z"/>
+<path class="st2" d="M14.1,16.6l-8.6-2.3l2.3-8.6L16.4,8L14.1,16.6z M6,14l7.8,2.1l2.1-7.8L8.1,6.2L6,14z"/>
+<path class="st2" d="M14.3,14.6H7.6V7.8l6.8,0L14.3,14.6z M8,14.1h5.9l0-5.9L8,8.2V14.1z"/>
+<path class="st2" d="M13.7,12.8L9.3,14L8.1,9.6l4.4-1.2L13.7,12.8z M9.6,13.4l3.6-1l-1-3.6l-3.6,1L9.6,13.4z"/>
+<path class="st2" d="M13,11.7l-2.6,1.5l-1.5-2.6l2.6-1.5L13,11.7z M10.5,12.8l2.1-1.2l-1.2-2.1l-2.1,1.2L10.5,12.8z"/>
+<path class="st2" d="M12.3,11.2l-1.4,1.4l-1.4-1.4l1.4-1.4L12.3,11.2z M10.9,12.3l1.1-1.1l-1.1-1.1l-1.1,1.1L10.9,12.3z"/>
+<path class="st2" d="M11.8,11l-0.6,1.1l-1.1-0.6l0.6-1.1L11.8,11z M11.1,11.9l0.5-0.9l-0.9-0.5l-0.5,0.9L11.1,11.9z"/>
+<path class="st2" d="M11.4,10.9l-0.2,0.8l-0.8-0.2l0.2-0.8L11.4,10.9z M11.2,11.6l0.2-0.6l-0.6-0.2l-0.2,0.6L11.2,11.6z"/>
 </svg>
