@@ -28,13 +28,13 @@ const QA_ITEMS = [
 
 export default function FAQ() {
   return (
-    <div style={pageStyle}>
-      <div style={contentStyle}>
-        <h1 style={titleStyle}>FAQ</h1>
-        <dl style={listStyle}>
+    <div className="page-scroll faq-page" style={pageStyle}>
+      <div className="faq-content" style={contentStyle}>
+        <h1 className="faq-title" style={titleStyle}>FAQ</h1>
+        <dl className="faq-list" style={listStyle}>
           {QA_ITEMS.map(({ question, answer }) => (
             <div key={question} style={itemStyle}>
-              <dt style={questionStyle}>{question}</dt>
+              <dt className="faq-question" style={questionStyle}>{question}</dt>
               <dd style={answerStyle}>{answer || '…'}</dd>
             </div>
           ))}

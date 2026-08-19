@@ -42,15 +42,15 @@ const PROJECTS: Project[] = [
 
 export default function Projects() {
   return (
-    <div style={pageStyle}>
+    <div className="page-scroll projects-page" style={pageStyle}>
       {PROJECTS.map((project, index) => (
         <div key={project.title} style={{ display: 'contents' }}>
           {index > 0 && (
-            <img src={LONG_HORIZ} alt="" aria-hidden="true" style={dividerStyle} />
+            <img src={LONG_HORIZ} alt="" aria-hidden="true" className="projects-divider" style={dividerStyle} />
           )}
-          <section style={sectionStyle}>
-            <div style={contentStyle}>
-              <div style={titleColumnStyle}>
+          <section className="projects-section" style={sectionStyle}>
+            <div className="projects-content" style={contentStyle}>
+              <div className="projects-title-column" style={titleColumnStyle}>
                 <h2 style={titleStyle}>{project.title}</h2>
                 <div style={iconRowStyle}>
                   <a
@@ -75,12 +75,12 @@ export default function Projects() {
                   )}
                 </div>
                 {project.image && (
-                  <div style={imageFrameStyle}>
+                  <div className="projects-image-frame" style={imageFrameStyle}>
                     <img src={project.image} alt={`${project.title} preview`} style={imageStyle} />
                   </div>
                 )}
               </div>
-              <p style={descriptionStyle}>{project.description}</p>
+              <p className="projects-description" style={descriptionStyle}>{project.description}</p>
             </div>
           </section>
         </div>
