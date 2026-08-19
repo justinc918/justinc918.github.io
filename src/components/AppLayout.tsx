@@ -28,6 +28,7 @@ const layoutStyle: React.CSSProperties = {
 
 const mainStyle: React.CSSProperties = {
   flex: 1,
+  minHeight: 0,
   overflow: 'hidden',
   position: 'relative',
 }

@@ -43,11 +43,11 @@ const LINKS: LinkItem[] = [
 
 export default function Home() {
   return (
-    <div style={pageStyle}>
-      <div style={contentStyle}>
-        <div style={leftColumnStyle}>
+    <div className="page-scroll home-page" style={pageStyle}>
+      <div className="home-content" style={contentStyle}>
+        <div className="home-left-column" style={leftColumnStyle}>
           <img src={ME} alt="Justin" style={profileImageStyle} />
-          <div style={linksStyle}>
+          <div className="home-links" style={linksStyle}>
             {LINKS.map((link) => {
               const isMail = link.href.startsWith('mailto:')
               return (
@@ -65,10 +65,10 @@ export default function Home() {
             })}
           </div>
         </div>
-        <img src={VERTICAL} alt="" aria-hidden="true" style={dividerStyle} />
-        <div style={rightColumnStyle}>
-          <h1 style={nameStyle}>Hello, I'm Justin</h1>
-          <p style={descriptionStyle}>
+        <img src={VERTICAL} alt="" aria-hidden="true" className="home-divider" style={dividerStyle} />
+        <div className="home-right-column" style={rightColumnStyle}>
+          <h1 className="home-name" style={nameStyle}>Hello, I'm Justin</h1>
+          <p className="home-description" style={descriptionStyle}>
   I'm currently a rising junior at UCLA studying Computer Science, with a focus on machine learning and NLP. I am also a Kleiner Perkins Engineering Fellow and an officer for ACM ICPC at UCLA.
   <br />
   <br />
