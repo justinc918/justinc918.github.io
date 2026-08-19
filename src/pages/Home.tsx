@@ -88,7 +88,7 @@ const pageStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   justifyContent: 'center',
   overflowY: 'auto',
   padding: '48px 0',
@@ -100,7 +100,7 @@ const contentStyle: React.CSSProperties = {
   gap: 56,
   width: '80%',
   maxWidth: 1100,
-  margin: '0 auto',
+  margin: 'auto',
 }
 
 const leftColumnStyle: React.CSSProperties = {
