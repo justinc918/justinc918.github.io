@@ -62,6 +62,7 @@ export default function TopBar() {
   const artworkActive = pathname.startsWith('/artwork')
   const [menuOpen, setMenuOpen] = useState(false)
 
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<HTMLElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
   const itemRefs = useRef<(HTMLElement | null)[]>([])
@@ -113,6 +114,20 @@ export default function TopBar() {
     return () => window.removeEventListener('resize', onResize)
   }, [activeIndex, moveTo, animated, isMobile])
 
+  useLayoutEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+
+    const syncHeight = () => {
+      document.documentElement.style.setProperty('--topbar-height', `${el.offsetHeight}px`)
+    }
+
+    syncHeight()
+    const observer = new ResizeObserver(syncHeight)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [isMobile])
+
   useEffect(() => {
     setMenuOpen(false)
   }, [pathname])
@@ -134,7 +149,7 @@ export default function TopBar() {
   }
 
   return (
-    <div style={isMobile ? mobileBarWrapperStyle : barWrapperStyle}>
+    <div ref={wrapperRef} style={isMobile ? mobileBarWrapperStyle : barWrapperStyle}>
       {isMobile ? (
         <img
           src={MOBILE_MENUBAR}
@@ -299,8 +314,10 @@ const barWrapperStyle: React.CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   padding: '14px 28px',
-  flexShrink: 0,
-  position: 'relative',
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
   zIndex: 200,
 }
 
@@ -312,8 +329,10 @@ const mobileBarWrapperStyle: React.CSSProperties = {
   paddingTop: 'max(14px, env(safe-area-inset-top))',
   paddingLeft: 'max(20px, env(safe-area-inset-left))',
   paddingRight: 'max(20px, env(safe-area-inset-right))',
-  flexShrink: 0,
-  position: 'relative',
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
   zIndex: 200,
 }
 

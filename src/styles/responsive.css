@@ -106,6 +106,7 @@
 
   .faq-page {
     padding: 24px 16px 32px !important;
+    padding-top: calc(var(--topbar-height, 60px) + 24px) !important;
   }
 
   .faq-title {

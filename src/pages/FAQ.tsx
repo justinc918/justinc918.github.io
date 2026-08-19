@@ -30,7 +30,7 @@ export default function FAQ() {
   return (
     <div className="page-scroll faq-page" style={pageStyle}>
       <div className="faq-content" style={contentStyle}>
-        <h1 className="faq-title" style={titleStyle}>FAQ</h1>
+        <h1 className="faq-title" style={titleStyle}>Questions?</h1>
         <dl className="faq-list" style={listStyle}>
           {QA_ITEMS.map(({ question, answer }) => (
             <div key={question} style={itemStyle}>
@@ -51,7 +51,8 @@ const pageStyle: React.CSSProperties = {
   alignItems: 'flex-start',
   justifyContent: 'center',
   overflow: 'auto',
-  padding: '5vh 32px 48px',
+  padding: '48px 32px',
+  paddingTop: 'calc(var(--topbar-height, 60px) + 5vh)',
 }
 
 const contentStyle: React.CSSProperties = {
