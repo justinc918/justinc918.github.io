@@ -133,7 +133,7 @@ export default function Digital() {
     return (
       <div style={mobilePageStyle}>
         <p style={mobileMessageStyle}>
-          The artwork timeline is best viewed on a wider screen. Please visit this page on a tablet or desktop.
+          Sorry, the Artwork page is best viewed on a wider screen (though I'm taking ideas for a vertical version).
         </p>
       </div>
     )

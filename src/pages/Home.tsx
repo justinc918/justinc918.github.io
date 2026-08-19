@@ -41,29 +41,35 @@ const LINKS: LinkItem[] = [
   { label: 'Email', href: 'mailto:justinc918@g.ucla.edu', Icon: EmailIcon },
 ]
 
+function SocialLinks({ className }: { className: string }) {
+  return (
+    <div className={className} style={linksStyle}>
+      {LINKS.map((link) => {
+        const isMail = link.href.startsWith('mailto:')
+        return (
+          <a
+            key={link.label}
+            href={link.href}
+            target={isMail ? undefined : '_blank'}
+            rel={isMail ? undefined : 'noopener noreferrer'}
+            aria-label={link.label}
+            style={linkStyle}
+          >
+            <link.Icon />
+          </a>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function Home() {
   return (
     <div className="page-scroll home-page" style={pageStyle}>
       <div className="home-content" style={contentStyle}>
         <div className="home-left-column" style={leftColumnStyle}>
           <img src={ME} alt="Justin" style={profileImageStyle} />
-          <div className="home-links" style={linksStyle}>
-            {LINKS.map((link) => {
-              const isMail = link.href.startsWith('mailto:')
-              return (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target={isMail ? undefined : '_blank'}
-                  rel={isMail ? undefined : 'noopener noreferrer'}
-                  aria-label={link.label}
-                  style={linkStyle}
-                >
-                  <link.Icon />
-                </a>
-              )
-            })}
-          </div>
+          <SocialLinks className="home-links home-links--desktop" />
         </div>
         <img src={VERTICAL} alt="" aria-hidden="true" className="home-divider" style={dividerStyle} />
         <div className="home-right-column" style={rightColumnStyle}>
@@ -78,6 +84,7 @@ export default function Home() {
     <br />
     ! More stuff is coming at a later date, including my whiteboard drawings, and maybe another self portrait !
 </p>
+          <SocialLinks className="home-links home-links--mobile" />
         </div>
       </div>
     </div>
