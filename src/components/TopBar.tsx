@@ -6,6 +6,14 @@ const BASE = import.meta.env.BASE_URL
 const RESUME_URL = `${BASE}files/JustinChenResumeF.pdf`
 const SMALL_HORIZ = `${BASE}images/common/small_horiz.svg`
 const LOGO = `${BASE}images/common/logo.png`
+const MENUBAR = `${BASE}images/common/menubar.png`
+const MOBILE_MENUBAR = `${BASE}images/common/mobile_menubar-390w.png`
+const MOBILE_MENUBAR_SRCSET = [
+  `${BASE}images/common/mobile_menubar-390w.png 390w`,
+  `${BASE}images/common/mobile_menubar-390w@2x.png 780w`,
+  `${BASE}images/common/mobile_menubar-428w.png 428w`,
+  `${BASE}images/common/mobile_menubar-428w@2x.png 856w`,
+].join(', ')
 
 const navLinkStyle = ({ isActive }: { isActive: boolean }): React.CSSProperties => ({
   color: isActive ? '#c4d3ff' : 'rgba(196,211,255,0.75)',
@@ -117,6 +125,18 @@ export default function TopBar() {
 
   return (
     <div style={isMobile ? mobileBarWrapperStyle : barWrapperStyle}>
+      {isMobile ? (
+        <img
+          src={MOBILE_MENUBAR}
+          srcSet={MOBILE_MENUBAR_SRCSET}
+          sizes="100vw"
+          alt=""
+          aria-hidden="true"
+          style={barBgImageStyle}
+        />
+      ) : (
+        <img src={MENUBAR} alt="" aria-hidden="true" style={barBgImageStyle} />
+      )}
       <NavLink to="/" end style={isMobile ? mobileLogoLinkStyle : logoLinkStyle} aria-label="Home">
         <img src={LOGO} alt="" style={logoStyle} />
       </NavLink>
@@ -233,6 +253,17 @@ export default function TopBar() {
   )
 }
 
+const barBgImageStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: 'auto',
+  pointerEvents: 'none',
+  userSelect: 'none',
+  zIndex: 0,
+}
+
 const navItemStyle: React.CSSProperties = {
   position: 'relative',
   display: 'inline-flex',
@@ -281,12 +312,15 @@ const logoLinkStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   textDecoration: 'none',
+  zIndex: 1,
 }
 
 const mobileLogoLinkStyle: React.CSSProperties = {
+  position: 'relative',
   display: 'flex',
   alignItems: 'center',
   textDecoration: 'none',
+  zIndex: 1,
 }
 
 const logoStyle: React.CSSProperties = {
@@ -304,6 +338,7 @@ const barStyle: React.CSSProperties = {
   background: 'transparent',
   position: 'relative',
   textTransform: 'uppercase',
+  zIndex: 1,
 }
 
 const menuButtonStyle: React.CSSProperties = {
@@ -317,6 +352,8 @@ const menuButtonStyle: React.CSSProperties = {
   background: 'transparent',
   color: '#c4d3ff',
   cursor: 'pointer',
+  position: 'relative',
+  zIndex: 1,
 }
 
 const menuIconStyle: React.CSSProperties = {
