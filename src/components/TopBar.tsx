@@ -30,6 +30,16 @@ const externalLinkStyle: React.CSSProperties = {
   letterSpacing: '0.03em',
 }
 
+const mobileNavLinkStyle = ({ isActive }: { isActive: boolean }): React.CSSProperties => ({
+  ...navLinkStyle({ isActive }),
+  fontSize: 20,
+})
+
+const mobileExternalLinkStyle: React.CSSProperties = {
+  ...externalLinkStyle,
+  fontSize: 20,
+}
+
 type Indicator = { left: number; width: number; top: number; visible: boolean }
 
 type NavItem = {
@@ -163,11 +173,14 @@ export default function TopBar() {
                   key={item.label}
                   to={item.to!}
                   end={item.to === '/'}
-                  style={mobileNavItemStyle}
+                  style={{
+                    ...mobileNavItemStyle,
+                    ...mobileNavItemDividerStyle,
+                  }}
                   onClick={() => setMenuOpen(false)}
                 >
                   {({ isActive }) => (
-                    <span style={navLinkStyle({ isActive: item.isActive(pathname) || isActive })}>
+                    <span style={mobileNavLinkStyle({ isActive: item.isActive(pathname) || isActive })}>
                       {item.label}
                     </span>
                   )}
@@ -180,7 +193,7 @@ export default function TopBar() {
                 style={mobileNavItemStyle}
                 onClick={() => setMenuOpen(false)}
               >
-                <span style={externalLinkStyle}>Resume</span>
+                <span style={mobileExternalLinkStyle}>Resume</span>
               </a>
             </nav>
           )}
@@ -377,7 +390,11 @@ const mobileNavStyle: React.CSSProperties = {
 const mobileNavItemStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  minHeight: 48,
-  padding: '0 20px',
+  minHeight: 60,
+  padding: '16px 24px',
   textDecoration: 'none',
+}
+
+const mobileNavItemDividerStyle: React.CSSProperties = {
+  borderBottom: '1px solid rgba(196, 211, 255, 0.75)',
 }
