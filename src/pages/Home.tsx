@@ -127,7 +127,6 @@ const profileImageStyle: React.CSSProperties = {
 }
 
 const linksStyle: React.CSSProperties = {
-  display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',

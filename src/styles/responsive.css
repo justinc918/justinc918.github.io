@@ -7,6 +7,10 @@
   outline-offset: 2px;
 }
 
+.home-links {
+  display: flex;
+}
+
 .home-links--mobile {
   display: none;
 }
