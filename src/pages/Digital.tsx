@@ -133,7 +133,7 @@ export default function Digital() {
     return (
       <div style={mobilePageStyle}>
         <p style={mobileMessageStyle}>
-          Sorry, the Artwork page is best viewed on a wider screen (though I'm taking ideas for a vertical version).
+          Sorry, the Artwork page is best viewed on a wider screen/window (though I'm taking ideas for a vertical version).
         </p>
       </div>
     )
