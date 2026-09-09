@@ -99,6 +99,7 @@ const FAINT = 'rgba(196,211,255,0.4)'
 const COLUMN_WIDTH = 320
 const FIRST_GAP_EXTRA = 960 // widen the first column so the gap to the second event runs extra long
 const FIRST_GAP_REPEATS = 4 // tile the segment this many times across the extra gap width
+const SEGMENT_HOLE_X = COLUMN_WIDTH / 2 // each line tile has a marker hole at its horizontal center
 const BOX_RATIO = 4 / 3
 const BOX_WIDTH = COLUMN_WIDTH - 64
 const BOX_HEIGHT = BOX_WIDTH / BOX_RATIO
@@ -352,6 +353,12 @@ function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen }: Colum
           gapRepeats={isFirst ? FIRST_GAP_REPEATS : undefined}
           gapWidth={isFirst ? FIRST_GAP_EXTRA : undefined}
         />
+        {isFirst &&
+          Array.from({ length: FIRST_GAP_REPEATS - 1 }, (_, index) => (
+            <div key={index} style={gapPointStyle(index + 1)}>
+              <TimelinePoint asset={assets?.point?.marker} />
+            </div>
+          ))}
         <div style={shiftStyle}>
           <TimelinePoint asset={assets?.point?.marker} />
         </div>
@@ -819,6 +826,16 @@ const spineStyle: React.CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
 }
+
+// Decorative markers for the extra holes created when the first column's line
+// is tiled — same diamond as event points, but with no connector or artwork.
+const gapPointStyle = (tileIndex: number): React.CSSProperties => ({
+  position: 'absolute',
+  left: tileIndex * COLUMN_WIDTH + SEGMENT_HOLE_X,
+  top: '50%',
+  transform: 'translate(-50%, -50%)',
+  zIndex: 1,
+})
 
 // Line
 
