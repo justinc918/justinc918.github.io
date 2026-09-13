@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useBreakpoint } from '../../hooks/useBreakpoint'
 
 export type TimelineEvent = {
   id: string
@@ -268,6 +269,8 @@ export function ArtworkLightbox({
   box?: TimelineAssets['box']
   onClose: () => void
 }) {
+  const isMobile = useBreakpoint('mobile')
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -292,7 +295,12 @@ export function ArtworkLightbox({
       aria-label={label}
     >
       <style>{lightboxKeyframes}</style>
-      <figure style={lightboxFigureStyle} onClick={(e) => e.stopPropagation()}>
+      {/* On mobile, let taps on the artwork bubble up so touching anywhere closes
+          the lightbox. On desktop, keep clicks on the artwork from closing it. */}
+      <figure
+        style={lightboxFigureStyle}
+        onClick={isMobile ? undefined : (e) => e.stopPropagation()}
+      >
         <FramedArtwork
           event={event}
           box={box}
