@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import {
   ArtworkLightbox,
   boxDateStyle,
@@ -31,20 +31,53 @@ const mobileImageStyle: React.CSSProperties = {
 export default function VerticalArtworkTimeline({ events, assets, credits }: VerticalTimelineProps) {
   const [activeEvent, setActiveEvent] = useState<TimelineEvent | null>(null)
   const markerSrc = assets?.point?.marker
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const firstMediaRef = useRef<HTMLDivElement>(null)
+  const [leadInset, setLeadInset] = useState(24)
+
+  // Push the first artwork down so its image sits near the vertical center of the scroll area.
+  useLayoutEffect(() => {
+    const scrollEl = scrollRef.current
+    const mediaEl = firstMediaRef.current
+    if (!scrollEl || !mediaEl) return
+
+    const update = () => {
+      const viewH = scrollEl.clientHeight
+      const mediaH = mediaEl.offsetHeight
+      setLeadInset(Math.max(24, Math.round(viewH / 2 - mediaH / 2)))
+    }
+
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(scrollEl)
+    ro.observe(mediaEl)
+    return () => ro.disconnect()
+  }, [events])
+
+  const innerStyleWithInset: React.CSSProperties = {
+    ...innerStyle,
+    paddingTop: leadInset,
+    ['--vt-lead-inset' as string]: `${leadInset}px`,
+  }
 
   return (
     <>
-      <div className="page-scroll digital-page vertical-artwork-timeline" style={pageStyle}>
-        <div className="vertical-artwork-timeline__inner" style={innerStyle}>
+      <div
+        ref={scrollRef}
+        className="page-scroll digital-page vertical-artwork-timeline"
+        style={pageStyle}
+      >
+        <div className="vertical-artwork-timeline__inner" style={innerStyleWithInset}>
           <div className="vertical-artwork-timeline__rail" aria-hidden="true" />
           <ol className="vertical-artwork-timeline__list" style={listStyle}>
-            {events.map((event) => (
+            {events.map((event, index) => (
               <VerticalTimelineItem
                 key={event.id}
                 event={event}
                 box={assets?.box}
                 markerSrc={markerSrc}
                 onOpen={setActiveEvent}
+                mediaRef={index === 0 ? firstMediaRef : undefined}
               />
             ))}
           </ol>
@@ -73,11 +106,13 @@ function VerticalTimelineItem({
   box,
   markerSrc,
   onOpen,
+  mediaRef,
 }: {
   event: TimelineEvent
   box?: TimelineAssets['box']
   markerSrc?: string
   onOpen: (event: TimelineEvent) => void
+  mediaRef?: React.Ref<HTMLDivElement>
 }) {
   const canOpen = Boolean(event.imageSrc)
   const label = event.date
@@ -101,6 +136,7 @@ function VerticalTimelineItem({
       </div>
       <article className="vertical-artwork-timeline__card" style={cardStyle}>
         <div
+          ref={mediaRef}
           className="vertical-artwork-timeline__media"
           style={canOpen ? { ...mediaWrapStyle, cursor: 'pointer' } : mediaWrapStyle}
           role={canOpen ? 'button' : undefined}
@@ -141,7 +177,9 @@ const pageStyle: React.CSSProperties = {
 
 const innerStyle: React.CSSProperties = {
   position: 'relative',
-  padding: '24px 20px 40px',
+  paddingLeft: 20,
+  paddingRight: 20,
+  paddingBottom: 40,
   maxWidth: 560,
   margin: '0 auto',
 }

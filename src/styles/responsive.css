@@ -132,7 +132,7 @@
   .vertical-artwork-timeline__rail {
     position: absolute;
     left: calc(20px + 11px - 1px);
-    top: calc(24px + 11px);
+    top: calc(var(--vt-lead-inset, 24px) + 11px);
     bottom: 48px;
     width: 2px;
     background-color: #ccd8ff;
