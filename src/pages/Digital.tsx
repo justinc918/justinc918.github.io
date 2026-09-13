@@ -1,5 +1,6 @@
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import ArtworkTimeline, { CreditHighlight as Hi, type TimelineEvent } from '../components/timeline/ArtworkTimeline'
+import VerticalArtworkTimeline from '../components/timeline/VerticalArtworkTimeline'
 
 const BASE = import.meta.env.BASE_URL
 const CREDITS = (
@@ -131,11 +132,7 @@ export default function Digital() {
 
   if (isMobile) {
     return (
-      <div style={mobilePageStyle}>
-        <p style={mobileMessageStyle}>
-          Sorry, the Artwork page is best viewed on a wider screen/window (though I'm taking ideas for a vertical version).
-        </p>
-      </div>
+      <VerticalArtworkTimeline events={EVENTS} assets={ASSETS} credits={CREDITS} />
     )
   }
 
@@ -149,22 +146,4 @@ export default function Digital() {
 const pageStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
-}
-
-const mobilePageStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '24px 20px',
-}
-
-const mobileMessageStyle: React.CSSProperties = {
-  color: 'rgba(196,211,255,0.85)',
-  fontSize: 17,
-  lineHeight: 1.6,
-  textAlign: 'center',
-  maxWidth: 320,
-  margin: 0,
 }

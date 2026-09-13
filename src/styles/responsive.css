@@ -124,4 +124,44 @@
   .faq-question {
     font-size: 17px !important;
   }
+
+  .digital-page.vertical-artwork-timeline {
+    padding: 0;
+  }
+
+  .vertical-artwork-timeline__rail {
+    position: absolute;
+    left: calc(20px + 11px - 1px);
+    top: calc(24px + 11px);
+    bottom: 48px;
+    width: 2px;
+    background-color: #ccd8ff;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .vertical-artwork-timeline__item {
+    position: relative;
+  }
+
+  .vertical-artwork-timeline__item::before {
+    content: '';
+    position: absolute;
+    left: 22px;
+    top: 11px;
+    width: 12px;
+    height: 2px;
+    background-color: #ccd8ff;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .vertical-artwork-timeline__credits {
+    margin-top: 28px;
+    padding-left: calc(22px + 12px);
+  }
+
+  .vertical-artwork-timeline__media {
+    min-height: 44px;
+  }
 }

@@ -81,8 +81,6 @@ export default function Home() {
     Outside of my studies, research projects, and hackathon things (see Projects), I cook, gym, and draw. Do stop by the Artwork page for my creations.
     
     <br />
-    <br />
-    ! More stuff is coming at a later date, including my whiteboard drawings, and maybe another self portrait !
 </p>
           <SocialLinks className="home-links home-links--mobile" />
         </div>
