@@ -7,8 +7,22 @@ interface ImageItem {
   y: number
 }
 
+interface SectionItem {
+  id: string
+  src: string
+}
+
+interface SectionSpec {
+  id: string
+  items: SectionItem[]
+  columns?: number
+  /** Extra vertical offset from viewport center, in px. Positive moves it down. */
+  offsetY?: number
+}
+
 interface Props {
-  images: ImageItem[]
+  images?: ImageItem[]
+  sections?: SectionSpec[]
 }
 
 interface Transform {
@@ -21,13 +35,34 @@ const MIN_SCALE = 0.1
 const MAX_SCALE = 8
 const CARD_WIDTH = 280
 
+// Grouped artwork section: uniform frames arranged in a grid, edges touching.
+const FRAME_WIDTH = 260
+const FRAME_HEIGHT = 360
+const FRAME_GAP = 0
+const FRAME_PADDING = 12
+const SECTION_COLUMNS = 2
+const SECTION_OFFSET_Y = 70
+// Editable placeholder texture for the frame edges/backing.
+const FRAME_TEXTURE_SRC = `${import.meta.env.BASE_URL}images/common/frame_texture.png`
+
 const INITIAL_TRANSFORM: Transform = { x: 0, y: 0, scale: 1 }
 const TEXTURE_SRC = `${import.meta.env.BASE_URL}images/common/whiteboard.png`
 const TEXTURE_TILE = 512
 
-export default function Whiteboard({ images }: Props) {
+export default function Whiteboard({ images = [], sections = [] }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [transform, setTransform] = useState<Transform>(INITIAL_TRANSFORM)
+  const [viewport, setViewport] = useState({ width: 0, height: 0 })
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const update = () => setViewport({ width: el.clientWidth, height: el.clientHeight })
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const isPanning = useRef(false)
   const lastPointer = useRef({ x: 0, y: 0 })
@@ -123,6 +158,10 @@ export default function Whiteboard({ images }: Props) {
         {images.map(img => (
           <ImageCard key={img.id} item={img} />
         ))}
+        {viewport.width > 0 &&
+          sections.map(spec => (
+            <SectionGroup key={spec.id} spec={spec} viewport={viewport} />
+          ))}
       </div>
 
       <button
@@ -153,6 +192,69 @@ function ImageCard({ item }: { item: ImageItem }) {
         display: 'block',
       }}
     />
+  )
+}
+
+function SectionGroup({
+  spec,
+  viewport,
+}: {
+  spec: SectionSpec
+  viewport: { width: number; height: number }
+}) {
+  const columns = spec.columns ?? SECTION_COLUMNS
+  const rows = Math.ceil(spec.items.length / columns)
+  const sectionWidth = columns * FRAME_WIDTH + (columns - 1) * FRAME_GAP
+  const sectionHeight = rows * FRAME_HEIGHT + (rows - 1) * FRAME_GAP
+
+  // Center horizontally, sit slightly below the vertical center of the viewport.
+  const left = (viewport.width - sectionWidth) / 2
+  const top = (viewport.height - sectionHeight) / 2 + (spec.offsetY ?? SECTION_OFFSET_Y)
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left,
+        top,
+        display: 'grid',
+        gridTemplateColumns: `repeat(${columns}, ${FRAME_WIDTH}px)`,
+        gap: FRAME_GAP,
+      }}
+    >
+      {spec.items.map(item => (
+        <div
+          key={item.id}
+          data-card
+          style={{
+            width: FRAME_WIDTH,
+            height: FRAME_HEIGHT,
+            // Editable placeholder texture for the frame edges/backing.
+            backgroundColor: '#000',
+            backgroundImage: `url(${FRAME_TEXTURE_SRC})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            padding: FRAME_PADDING,
+            boxSizing: 'border-box',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <img
+            src={item.src}
+            alt={item.id}
+            draggable={false}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
+        </div>
+      ))}
+    </div>
   )
 }
 
