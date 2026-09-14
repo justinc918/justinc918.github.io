@@ -14,10 +14,10 @@ interface SectionItem {
 
 interface SectionSpec {
   id: string
+  x: number
+  y: number
   items: SectionItem[]
   columns?: number
-  /** Extra vertical offset from viewport center, in px. Positive moves it down. */
-  offsetY?: number
 }
 
 interface Props {
@@ -41,7 +41,6 @@ const FRAME_HEIGHT = 360
 const FRAME_GAP = 0
 const FRAME_PADDING = 12
 const SECTION_COLUMNS = 2
-const SECTION_OFFSET_Y = 70
 // Editable placeholder texture for the frame edges/backing.
 const FRAME_TEXTURE_SRC = `${import.meta.env.BASE_URL}images/common/frame_texture.png`
 
@@ -52,18 +51,6 @@ const TEXTURE_TILE = 512
 export default function Whiteboard({ images = [], sections = [] }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [transform, setTransform] = useState<Transform>(INITIAL_TRANSFORM)
-  const [viewport, setViewport] = useState({ width: 0, height: 0 })
-
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-    const update = () => setViewport({ width: el.clientWidth, height: el.clientHeight })
-    update()
-    const ro = new ResizeObserver(update)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
   const isPanning = useRef(false)
   const lastPointer = useRef({ x: 0, y: 0 })
 
@@ -158,10 +145,9 @@ export default function Whiteboard({ images = [], sections = [] }: Props) {
         {images.map(img => (
           <ImageCard key={img.id} item={img} />
         ))}
-        {viewport.width > 0 &&
-          sections.map(spec => (
-            <SectionGroup key={spec.id} spec={spec} viewport={viewport} />
-          ))}
+        {sections.map(spec => (
+          <SectionGroup key={spec.id} spec={spec} />
+        ))}
       </div>
 
       <button
@@ -195,28 +181,15 @@ function ImageCard({ item }: { item: ImageItem }) {
   )
 }
 
-function SectionGroup({
-  spec,
-  viewport,
-}: {
-  spec: SectionSpec
-  viewport: { width: number; height: number }
-}) {
+function SectionGroup({ spec }: { spec: SectionSpec }) {
   const columns = spec.columns ?? SECTION_COLUMNS
-  const rows = Math.ceil(spec.items.length / columns)
-  const sectionWidth = columns * FRAME_WIDTH + (columns - 1) * FRAME_GAP
-  const sectionHeight = rows * FRAME_HEIGHT + (rows - 1) * FRAME_GAP
-
-  // Center horizontally, sit slightly below the vertical center of the viewport.
-  const left = (viewport.width - sectionWidth) / 2
-  const top = (viewport.height - sectionHeight) / 2 + (spec.offsetY ?? SECTION_OFFSET_Y)
 
   return (
     <div
       style={{
         position: 'absolute',
-        left,
-        top,
+        left: spec.x,
+        top: spec.y,
         display: 'grid',
         gridTemplateColumns: `repeat(${columns}, ${FRAME_WIDTH}px)`,
         gap: FRAME_GAP,

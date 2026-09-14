@@ -4,12 +4,14 @@ const BASE = import.meta.env.BASE_URL
 
 const IMAGES = [
   { id: 'harmonia', src: `${BASE}images/whiteboard/harmonia.webp`, x: 620, y: 80 },
-  { id: 'tswltw',   src: `${BASE}images/whiteboard/tswltw.webp`,   x: 340, y: 420 },
+  { id: 'tswltw',   src: `${BASE}images/whiteboard/tswltw.webp`,   x: -940, y: 1020 },
 ]
 
 const SECTIONS = [
   {
     id: 'grid',
+    x: 300,
+    y: 620,
     columns: 2,
     items: [
       { id: 'fulghor',  src: `${BASE}images/whiteboard/fulghor.webp`  },
