@@ -3,8 +3,7 @@ import Whiteboard from '../Whiteboard'
 const BASE = import.meta.env.BASE_URL
 
 const IMAGES = [
-  { id: 'harmonia', src: `${BASE}images/whiteboard/harmonia.webp`, x: 620, y: 80 },
-  { id: 'tswltw',   src: `${BASE}images/whiteboard/tswltw.webp`,   x: -940, y: 1020 },
+  { id: 'harmonia', src: `${BASE}images/whiteboard/harmonia.webp`, x: 620, y: 80 }
 ]
 
 const SECTIONS = [
@@ -12,12 +11,22 @@ const SECTIONS = [
     id: 'grid',
     x: 300,
     y: 620,
-    columns: 2,
+    rows: 2,
     items: [
-      { id: 'fulghor',  src: `${BASE}images/whiteboard/fulghor.webp`  },
-      { id: 'florence', src: `${BASE}images/whiteboard/florence.webp` },
+      { id: 'midra',  src: `${BASE}images/whiteboard/midra.webp`  },
+      { id: 'genichiro',  src: `${BASE}images/whiteboard/genichiro.webp`  },
+      { id: 'tswltw',   src: `${BASE}images/whiteboard/tswltw.webp`  },
       { id: 'bayle',    src: `${BASE}images/whiteboard/bayle.webp`    },
+      { id: 'florence', src: `${BASE}images/whiteboard/florence.webp` },
+      {id:'wylder', src: `${BASE}images/whiteboard/wylder.webp` },
+      {id:'laocoon', src: `${BASE}images/whiteboard/laocoon.webp` },
+      {id:'nameless', src: `${BASE}images/whiteboard/nameless.webp` },
+      {id:'nightfarer', src: `${BASE}images/whiteboard/nightfareres.webp` },
+      { id: 'fulghor',  src: `${BASE}images/whiteboard/fulghor.webp`  },
       { id: 'dragons',  src: `${BASE}images/whiteboard/dragons.webp`  },
+      {id:'nightlord', src: `${BASE}images/whiteboard/nightlord.webp` },
+      {id:'idk', src: `${BASE}images/whiteboard/IMG_1373.webp` },
+      {id:'ludwig', src: `${BASE}images/whiteboard/ludwig.webp` },
     ],
   },
 ]

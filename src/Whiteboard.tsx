@@ -17,7 +17,7 @@ interface SectionSpec {
   x: number
   y: number
   items: SectionItem[]
-  columns?: number
+  rows?: number
 }
 
 interface Props {
@@ -31,7 +31,7 @@ interface Transform {
   scale: number
 }
 
-const MIN_SCALE = 0.1
+const MIN_SCALE = 0.5
 const MAX_SCALE = 8
 const CARD_WIDTH = 280
 
@@ -40,7 +40,7 @@ const FRAME_WIDTH = 260
 const FRAME_HEIGHT = 360
 const FRAME_GAP = 0
 const FRAME_PADDING = 12
-const SECTION_COLUMNS = 2
+const SECTION_ROWS = 2
 // Editable placeholder texture for the frame edges/backing.
 const FRAME_TEXTURE_SRC = `${import.meta.env.BASE_URL}images/common/frame_texture.png`
 
@@ -182,7 +182,7 @@ function ImageCard({ item }: { item: ImageItem }) {
 }
 
 function SectionGroup({ spec }: { spec: SectionSpec }) {
-  const columns = spec.columns ?? SECTION_COLUMNS
+  const rows = spec.rows ?? SECTION_ROWS
 
   return (
     <div
@@ -191,7 +191,9 @@ function SectionGroup({ spec }: { spec: SectionSpec }) {
         left: spec.x,
         top: spec.y,
         display: 'grid',
-        gridTemplateColumns: `repeat(${columns}, ${FRAME_WIDTH}px)`,
+        gridAutoFlow: 'column',
+        gridTemplateRows: `repeat(${rows}, ${FRAME_HEIGHT}px)`,
+        gridAutoColumns: `${FRAME_WIDTH}px`,
         gap: FRAME_GAP,
       }}
     >
