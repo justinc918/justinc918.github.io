@@ -153,11 +153,17 @@ export default function Whiteboard({ images = [], sections = [] }: Props) {
 
       <button
         type="button"
+        aria-label="Reset view"
         onPointerDown={e => e.stopPropagation()}
         onClick={resetCamera}
         style={resetButtonStyle}
       >
-        Reset
+        <img
+          src={`${import.meta.env.BASE_URL}images/common/zoom.svg`}
+          alt=""
+          draggable={false}
+          style={{ display: 'block', width: 48, height: 48 }}
+        />
       </button>
     </div>
   )
@@ -238,14 +244,9 @@ const resetButtonStyle: React.CSSProperties = {
   position: 'fixed',
   bottom: 20,
   left: 20,
-  background: 'rgba(0,0,0,0.05)',
-  backdropFilter: 'blur(8px)',
-  border: '1px solid rgba(0,0,0,0.1)',
-  color: 'rgba(0,0,0,0.55)',
-  fontSize: 12,
-  padding: '6px 14px',
-  borderRadius: 20,
-  letterSpacing: '0.03em',
+  background: 'none',
+  border: 'none',
+  padding: 0,
   cursor: 'pointer',
   zIndex: 100,
 }
