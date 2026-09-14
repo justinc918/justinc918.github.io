@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   ArtworkLightbox,
   boxDateStyle,
@@ -35,7 +36,6 @@ export default function VerticalArtworkTimeline({ events, assets, credits }: Ver
   const firstMediaRef = useRef<HTMLDivElement>(null)
   const [leadInset, setLeadInset] = useState(24)
 
-  // Push the first artwork down so its image sits near the vertical center of the scroll area.
   useLayoutEffect(() => {
     const scrollEl = scrollRef.current
     const mediaEl = firstMediaRef.current
@@ -114,7 +114,9 @@ function VerticalTimelineItem({
   onOpen: (event: TimelineEvent) => void
   mediaRef?: React.Ref<HTMLDivElement>
 }) {
-  const canOpen = Boolean(event.imageSrc)
+  const navigate = useNavigate()
+  const isLink = Boolean(event.href)
+  const interactive = isLink || Boolean(event.imageSrc)
   const label = event.date
     ? event.title
       ? `${event.title} — ${event.date}`
@@ -122,7 +124,8 @@ function VerticalTimelineItem({
     : event.title
 
   const open = () => {
-    if (canOpen) onOpen(event)
+    if (isLink) navigate(event.href!)
+    else if (event.imageSrc) onOpen(event)
   }
 
   return (
@@ -138,13 +141,13 @@ function VerticalTimelineItem({
         <div
           ref={mediaRef}
           className="vertical-artwork-timeline__media"
-          style={canOpen ? { ...mediaWrapStyle, cursor: 'pointer' } : mediaWrapStyle}
-          role={canOpen ? 'button' : undefined}
-          tabIndex={canOpen ? 0 : undefined}
-          aria-label={canOpen ? `View ${label}` : undefined}
+          style={interactive ? { ...mediaWrapStyle, cursor: 'pointer' } : mediaWrapStyle}
+          role={interactive ? 'button' : undefined}
+          tabIndex={interactive ? 0 : undefined}
+          aria-label={interactive ? (isLink ? `Open ${label}` : `View ${label}`) : undefined}
           onClick={open}
           onKeyDown={(e) => {
-            if (canOpen && (e.key === 'Enter' || e.key === ' ')) {
+            if (interactive && (e.key === 'Enter' || e.key === ' ')) {
               e.preventDefault()
               open()
             }

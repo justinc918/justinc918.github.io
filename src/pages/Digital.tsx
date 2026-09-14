@@ -3,6 +3,16 @@ import ArtworkTimeline, { CreditHighlight as Hi, type TimelineEvent } from '../c
 import VerticalArtworkTimeline from '../components/timeline/VerticalArtworkTimeline'
 
 const BASE = import.meta.env.BASE_URL
+
+const WHITEBOARD_NODE: TimelineEvent = {
+  id: 'whiteboard',
+  date: '',
+  title: 'Whiteboard',
+  imageSrc: `${BASE}images/common/whiteboard.png`,
+  imageAlt: 'Whiteboard',
+  href: '/artwork/whiteboard',
+}
+
 const CREDITS = (
   <>
     <Hi>Drawabox (drawabox.com):</Hi> Where it all started; where I first learned to draw |{' '}
@@ -13,7 +23,6 @@ const CREDITS = (
   </>
 )
 
-// Oldest first (left). Newest goes on the right as entries are appended.
 const EVENTS: TimelineEvent[] = [
   {
     id: 'halfmoonbay',
@@ -131,14 +140,20 @@ export default function Digital() {
   const isMobile = useBreakpoint('mobile')
 
   if (isMobile) {
+    const mobileEvents = [EVENTS[0], WHITEBOARD_NODE, ...EVENTS.slice(1)]
     return (
-      <VerticalArtworkTimeline events={EVENTS} assets={ASSETS} credits={CREDITS} />
+      <VerticalArtworkTimeline events={mobileEvents} assets={ASSETS} credits={CREDITS} />
     )
   }
 
   return (
     <div style={pageStyle}>
-      <ArtworkTimeline events={EVENTS} assets={ASSETS} credits={CREDITS} />
+      <ArtworkTimeline
+        events={EVENTS}
+        assets={ASSETS}
+        credits={CREDITS}
+        gapNode={{ event: WHITEBOARD_NODE, gapIndex: 1 }}
+      />
     </div>
   )
 }
