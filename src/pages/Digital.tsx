@@ -1,7 +1,18 @@
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import ArtworkTimeline, { CreditHighlight as Hi, type TimelineEvent } from '../components/timeline/ArtworkTimeline'
+import VerticalArtworkTimeline from '../components/timeline/VerticalArtworkTimeline'
 
 const BASE = import.meta.env.BASE_URL
+
+const WHITEBOARD_NODE: TimelineEvent = {
+  id: 'whiteboard',
+  date: '',
+  title: 'Whiteboard',
+  imageSrc: `${BASE}images/common/whiteboard.png`,
+  imageAlt: 'Whiteboard',
+  href: '/artwork/whiteboard',
+}
+
 const CREDITS = (
   <>
     <Hi>Drawabox (drawabox.com):</Hi> Where it all started; where I first learned to draw |{' '}
@@ -12,7 +23,6 @@ const CREDITS = (
   </>
 )
 
-// Oldest first (left). Newest goes on the right as entries are appended.
 const EVENTS: TimelineEvent[] = [
   {
     id: 'halfmoonbay',
@@ -130,18 +140,20 @@ export default function Digital() {
   const isMobile = useBreakpoint('mobile')
 
   if (isMobile) {
+    const mobileEvents = [EVENTS[0], WHITEBOARD_NODE, ...EVENTS.slice(1)]
     return (
-      <div style={mobilePageStyle}>
-        <p style={mobileMessageStyle}>
-          Sorry, the Artwork page is best viewed on a wider screen/window (though I'm taking ideas for a vertical version).
-        </p>
-      </div>
+      <VerticalArtworkTimeline events={mobileEvents} assets={ASSETS} credits={CREDITS} />
     )
   }
 
   return (
     <div style={pageStyle}>
-      <ArtworkTimeline events={EVENTS} assets={ASSETS} credits={CREDITS} />
+      <ArtworkTimeline
+        events={EVENTS}
+        assets={ASSETS}
+        credits={CREDITS}
+        gapNode={{ event: WHITEBOARD_NODE, gapIndex: 1 }}
+      />
     </div>
   )
 }
@@ -149,22 +161,4 @@ export default function Digital() {
 const pageStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
-}
-
-const mobilePageStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '24px 20px',
-}
-
-const mobileMessageStyle: React.CSSProperties = {
-  color: 'rgba(196,211,255,0.85)',
-  fontSize: 17,
-  lineHeight: 1.6,
-  textAlign: 'center',
-  maxWidth: 320,
-  margin: 0,
 }

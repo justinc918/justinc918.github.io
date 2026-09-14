@@ -30,7 +30,7 @@ export default function FAQ() {
   return (
     <div className="page-scroll faq-page" style={pageStyle}>
       <div className="faq-content" style={contentStyle}>
-        <h1 className="faq-title" style={titleStyle}>FAQ</h1>
+        <h1 className="faq-title" style={titleStyle}>Questions?</h1>
         <dl className="faq-list" style={listStyle}>
           {QA_ITEMS.map(({ question, answer }) => (
             <div key={question} style={itemStyle}>
