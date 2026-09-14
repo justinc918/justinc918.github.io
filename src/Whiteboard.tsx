@@ -292,8 +292,14 @@ const resetButtonStyle: React.CSSProperties = {
   border: 'none',
   padding: 0,
   cursor: 'pointer',
-  zIndex: 100,
+  zIndex: 101,
 }
+
+// Clip the return button to its visible navy triangle so its click region
+// matches the artwork (the rest of the PNG is fully transparent). Percent-based
+// so it stays aligned at any scale. Traced from the image's opaque boundary.
+const RETURN_CLIP_PATH =
+  'polygon(0% 16%, 0% 100%, 81% 100%, 76% 90%, 72% 80%, 59% 70%, 48% 60%, 25% 50%, 17% 40%, 13% 30%, 7% 20%)'
 
 const returnButtonStyle: React.CSSProperties = {
   position: 'fixed',
@@ -304,5 +310,6 @@ const returnButtonStyle: React.CSSProperties = {
   padding: 0,
   display: 'block',
   cursor: 'pointer',
+  clipPath: RETURN_CLIP_PATH,
   zIndex: 100,
 }
