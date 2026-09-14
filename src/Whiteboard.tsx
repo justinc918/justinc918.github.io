@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 interface ImageItem {
   id: string
@@ -50,11 +51,37 @@ const INITIAL_TRANSFORM: Transform = { x: 0, y: 0, scale: MIN_SCALE }
 const TEXTURE_SRC = `${import.meta.env.BASE_URL}images/common/whiteboard.png`
 const TEXTURE_TILE = 512
 
+// Responsive UI sizing for the fixed corner buttons. The buttons keep their
+// current look at the reference viewport width and scale up/down from there,
+// clamped so they never get too small or too large.
+const UI_BASE_WIDTH = 1440
+const UI_MIN_SCALE = 0.7
+const UI_MAX_SCALE = 1.4
+
+// Rendered width of the return button image (anchored bottom-left). Treated as
+// a square for positioning the reset button in its empty (upper-right) corner.
+const RETURN_WIDTH = 312
+
+function getUiScale() {
+  if (typeof window === 'undefined') return 1
+  const raw = window.innerWidth / UI_BASE_WIDTH
+  return Math.min(UI_MAX_SCALE, Math.max(UI_MIN_SCALE, raw))
+}
+
 export default function Whiteboard({ images = [], sections = [] }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
   const [transform, setTransform] = useState<Transform>(INITIAL_TRANSFORM)
+  const [uiScale, setUiScale] = useState<number>(getUiScale)
   const isPanning = useRef(false)
   const lastPointer = useRef({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const onResize = () => setUiScale(getUiScale())
+    onResize()
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault()
@@ -156,13 +183,32 @@ export default function Whiteboard({ images = [], sections = [] }: Props) {
         aria-label="Reset view"
         onPointerDown={e => e.stopPropagation()}
         onClick={resetCamera}
-        style={resetButtonStyle}
+        style={{
+          ...resetButtonStyle,
+          left: RETURN_WIDTH * 0.55 * uiScale,
+          bottom: RETURN_WIDTH * 0.02 * uiScale,
+        }}
       >
         <img
           src={`${import.meta.env.BASE_URL}images/common/zoom.svg`}
           alt=""
           draggable={false}
-          style={{ display: 'block', width: 48, height: 48 }}
+          style={{ display: 'block', width: 48 * uiScale, height: 48 * uiScale }}
+        />
+      </button>
+
+      <button
+        type="button"
+        aria-label="Back to artwork"
+        onPointerDown={e => e.stopPropagation()}
+        onClick={() => navigate('/artwork/digital')}
+        style={returnButtonStyle}
+      >
+        <img
+          src={`${import.meta.env.BASE_URL}images/common/whiteboard_return.png`}
+          alt=""
+          draggable={false}
+          style={{ display: 'block', width: RETURN_WIDTH * uiScale * 0.70, height: 'auto' }}
         />
       </button>
     </div>
@@ -242,11 +288,21 @@ function SectionGroup({ spec }: { spec: SectionSpec }) {
 
 const resetButtonStyle: React.CSSProperties = {
   position: 'fixed',
-  bottom: 20,
-  left: 20,
   background: 'none',
   border: 'none',
   padding: 0,
+  cursor: 'pointer',
+  zIndex: 100,
+}
+
+const returnButtonStyle: React.CSSProperties = {
+  position: 'fixed',
+  bottom: 0,
+  left: 0,
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  display: 'block',
   cursor: 'pointer',
   zIndex: 100,
 }
