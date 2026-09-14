@@ -46,7 +46,7 @@ const SECTION_ROWS = 2
 // Editable placeholder texture for the frame edges/backing.
 const FRAME_TEXTURE_SRC = `${import.meta.env.BASE_URL}images/common/frame_texture.png`
 
-const INITIAL_TRANSFORM: Transform = { x: 0, y: 0, scale: 1 }
+const INITIAL_TRANSFORM: Transform = { x: 0, y: 0, scale: MIN_SCALE }
 const TEXTURE_SRC = `${import.meta.env.BASE_URL}images/common/whiteboard.png`
 const TEXTURE_TILE = 512
 

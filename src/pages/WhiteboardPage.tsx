@@ -3,16 +3,17 @@ import Whiteboard from '../Whiteboard'
 const BASE = import.meta.env.BASE_URL
 
 const IMAGES = [
-  { id: 'harmonia', src: `${BASE}images/whiteboard/harmonia.webp`, x: 620, y: 80 },
-  {id:'bloodguy', src: `${BASE}images/whiteboard/bloodguy.webp`, x: 1020, y: -280 },
-  {id:'gladius', src: `${BASE}images/whiteboard/gladius.webp`, x: 1620, y: -380,width:950 },
+  { id: 'harmonia', src: `${BASE}images/whiteboard/harmonia.webp`, x: -220, y: 280, width: 1167 },
+  {id:'bloodguy', src: `${BASE}images/whiteboard/bloodguy.webp`, x: 820, y: 100, width: 350 },
+  {id:'gladius', src: `${BASE}images/whiteboard/gladius.webp`, x: 1320, y: 380,width:950 },
+  {id:'img_1661', src: `${BASE}images/whiteboard/IMG_1661.webp`, x: 2290, y: 280,width:400 },
 ]
 
 const SECTIONS = [
   {
     id: 'grid',
-    x: 700,
-    y: 820,
+    x: 1000,
+    y: 1120,
     rows: 2,
     items: [
       { id: 'midra',  src: `${BASE}images/whiteboard/midra.webp`  },
