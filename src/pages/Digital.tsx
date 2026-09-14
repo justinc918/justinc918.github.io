@@ -4,9 +4,6 @@ import VerticalArtworkTimeline from '../components/timeline/VerticalArtworkTimel
 
 const BASE = import.meta.env.BASE_URL
 
-// A clickable artwork that lives on one of the empty timeline nodes right after
-// the first piece. Instead of opening the lightbox, it navigates to the
-// interactive whiteboard page.
 const WHITEBOARD_NODE: TimelineEvent = {
   id: 'whiteboard',
   date: '',
@@ -26,7 +23,6 @@ const CREDITS = (
   </>
 )
 
-// Oldest first (left). Newest goes on the right as entries are appended.
 const EVENTS: TimelineEvent[] = [
   {
     id: 'halfmoonbay',
@@ -144,7 +140,6 @@ export default function Digital() {
   const isMobile = useBreakpoint('mobile')
 
   if (isMobile) {
-    // No decorative gap nodes on mobile — slot the whiteboard in right after the first piece.
     const mobileEvents = [EVENTS[0], WHITEBOARD_NODE, ...EVENTS.slice(1)]
     return (
       <VerticalArtworkTimeline events={mobileEvents} assets={ASSETS} credits={CREDITS} />

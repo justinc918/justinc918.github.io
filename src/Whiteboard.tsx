@@ -29,11 +29,9 @@ export default function Whiteboard({ images }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [transform, setTransform] = useState<Transform>(INITIAL_TRANSFORM)
 
-  // Pan state tracked in a ref so event handlers never go stale
   const isPanning = useRef(false)
   const lastPointer = useRef({ x: 0, y: 0 })
 
-  // ── Zoom ──────────────────────────────────────────────────────────────────
   const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault()
 
@@ -45,7 +43,6 @@ export default function Whiteboard({ images }: Props) {
       const delta = e.deltaY < 0 ? 1.1 : 0.9
       const nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, prev.scale * delta))
 
-      // Zoom toward the cursor position
       const scaleRatio = nextScale / prev.scale
       return {
         scale: nextScale,
@@ -62,9 +59,7 @@ export default function Whiteboard({ images }: Props) {
     return () => el.removeEventListener('wheel', handleWheel)
   }, [handleWheel])
 
-  // ── Pan ───────────────────────────────────────────────────────────────────
   const onPointerDown = (e: React.PointerEvent) => {
-    // Only pan on the background (not on cards)
     if ((e.target as HTMLElement).closest('[data-card]')) return
     isPanning.current = true
     lastPointer.current = { x: e.clientX, y: e.clientY }
@@ -85,7 +80,6 @@ export default function Whiteboard({ images }: Props) {
     setTransform(INITIAL_TRANSFORM)
   }, [])
 
-  // ── Keyboard shortcuts ────────────────────────────────────────────────────
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === '0' && (e.metaKey || e.ctrlKey)) {
@@ -116,7 +110,6 @@ export default function Whiteboard({ images }: Props) {
         userSelect: 'none',
       }}
     >
-      {/* Canvas layer */}
       <div
         style={{
           position: 'absolute',
@@ -143,8 +136,6 @@ export default function Whiteboard({ images }: Props) {
     </div>
   )
 }
-
-// ── Image card ───────────────────────────────────────────────────────────────
 
 function ImageCard({ item }: { item: ImageItem }) {
   return (

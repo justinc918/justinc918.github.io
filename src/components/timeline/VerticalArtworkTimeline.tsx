@@ -36,7 +36,6 @@ export default function VerticalArtworkTimeline({ events, assets, credits }: Ver
   const firstMediaRef = useRef<HTMLDivElement>(null)
   const [leadInset, setLeadInset] = useState(24)
 
-  // Push the first artwork down so its image sits near the vertical center of the scroll area.
   useLayoutEffect(() => {
     const scrollEl = scrollRef.current
     const mediaEl = firstMediaRef.current

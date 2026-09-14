@@ -26,61 +26,45 @@ type TimelineProps = {
   events: TimelineEvent[]
   assets?: TimelineAssets
   credits?: React.ReactNode
-  /**
-   * An extra artwork pinned to one of the decorative "empty" markers in the
-   * widened first-column gap. `gapIndex` selects which marker (1-based, left to
-   * right); the event typically carries an `href` so clicking it navigates.
-   */
   gapNode?: { event: TimelineEvent; gapIndex: number }
 }
 
 const LINE_COLOR = '#ccd8ff'
 
 const COLUMN_WIDTH = 320
-const FIRST_GAP_EXTRA = 960 // widen the first column so the gap to the second event runs extra long
-const FIRST_GAP_REPEATS = 4 // tile the segment this many times across the extra gap width
-const SEGMENT_HOLE_X = COLUMN_WIDTH / 2 // each line tile has a marker hole at its horizontal center
+const FIRST_GAP_EXTRA = 960
+const FIRST_GAP_REPEATS = 4
+const SEGMENT_HOLE_X = COLUMN_WIDTH / 2
 const BOX_RATIO = 4 / 3
 const BOX_WIDTH = COLUMN_WIDTH - 64
 const BOX_HEIGHT = BOX_WIDTH / BOX_RATIO
-const CONNECTOR_GAP = 4 // space between connector and spine
-const CONNECTOR_LENGTH = 26 // same stem length above and below the line
+const CONNECTOR_GAP = 4
+const CONNECTOR_LENGTH = 26
 const LANE_HEIGHT = CONNECTOR_LENGTH + CONNECTOR_GAP + BOX_HEIGHT
 const POINT_SIZE = 22
-const CAPTION_WIDTH = 190 // caption sits to the left of the image
-const START_PADDING = 240 // extra room so the first piece's caption fits
+const CAPTION_WIDTH = 190
+const START_PADDING = 240
 
-// Custom bottom scrollbar. The track reuses the timeline's line segment art,
-// tiled at a shrunken size and 50% opacity; the thumb is a swappable rectangle.
-const SCROLLBAR_HEIGHT = 14 // thumb on-screen thickness
-const SCROLLBAR_TRACK_HEIGHT = 8 // back-line on-screen thickness
-const SCROLLBAR_MIN_THUMB = 56 // keep the thumb grabbable even on huge timelines
-const SCROLLBAR_BOTTOM_INSET = 22 // gap from the viewport bottom edge
+const SCROLLBAR_HEIGHT = 14
+const SCROLLBAR_TRACK_HEIGHT = 8
+const SCROLLBAR_MIN_THUMB = 56
+const SCROLLBAR_BOTTOM_INSET = 22
 const SCROLL_CLASS = 'artwork-timeline-scroll'
-
-// Timeline
 
 export default function ArtworkTimeline({ events, assets, credits, gapNode }: TimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  // The event whose image is expanded into the fullscreen lightbox, or null.
   const [activeEvent, setActiveEvent] = useState<TimelineEvent | null>(null)
 
-  // Oldest (left) first: start pinned to the far left.
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollLeft = 0
   }, [events])
 
-  // Translate a plain vertical mouse wheel into horizontal scrolling so mouse
-  // users (who have no horizontal wheel) can move through the timeline. A
-  // native non-passive listener is required because React's onWheel is passive
-  // and can't call preventDefault. Trackpad horizontal gestures (deltaX) are
-  // left untouched so two-axis input still feels natural.
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
     const onWheel = (e: WheelEvent) => {
-      if (el.scrollWidth <= el.clientWidth) return // nothing to scroll sideways
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return // real horizontal intent
+      if (el.scrollWidth <= el.clientWidth) return
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return
       if (e.deltaY === 0) return
       el.scrollLeft += e.deltaY
       e.preventDefault()
@@ -138,8 +122,6 @@ export default function ArtworkTimeline({ events, assets, credits, gapNode }: Ti
   )
 }
 
-// Scrollbar (custom, draggable, pinned to the viewport bottom)
-
 function TimelineScrollbar({
   scrollRef,
   track,
@@ -150,8 +132,6 @@ function TimelineScrollbar({
   thumb?: string
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
-  // Pixel geometry of the thumb, recomputed on scroll/resize so the bar mirrors
-  // the scroll container exactly.
   const [geo, setGeo] = useState({ left: 0, width: 0, scrollable: false })
 
   useEffect(() => {
@@ -179,8 +159,6 @@ function TimelineScrollbar({
     }
   }, [scrollRef])
 
-  // Drag the thumb: map horizontal pointer movement across the usable track
-  // range onto the container's scrollable range.
   const onThumbPointerDown = (e: React.PointerEvent) => {
     const el = scrollRef.current
     const track = trackRef.current
@@ -203,7 +181,6 @@ function TimelineScrollbar({
     window.addEventListener('pointerup', onUp)
   }
 
-  // Click anywhere on the track to jump the thumb's center to that point.
   const onTrackPointerDown = (e: React.PointerEvent) => {
     const el = scrollRef.current
     const track = trackRef.current
@@ -248,8 +225,6 @@ function TimelineScrollbar({
   )
 }
 
-// Column: one event = line segment + point + connector + box
-
 type ColumnProps = {
   event: TimelineEvent
   above: boolean
@@ -261,9 +236,6 @@ type ColumnProps = {
 }
 
 function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen, gapNode }: ColumnProps) {
-  // The first column is widened by FIRST_GAP_EXTRA. Because its point and box
-  // are centered, we shift them back left by half the extra width so the first
-  // image keeps its original left offset and only the gap after it grows.
   const contentShift = isFirst ? -FIRST_GAP_EXTRA / 2 : 0
   const shiftStyle: React.CSSProperties = contentShift
     ? { transform: `translateX(${contentShift}px)` }
@@ -271,7 +243,6 @@ function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen, gapNode
 
   return (
     <div style={isFirst ? { ...columnStyle, width: COLUMN_WIDTH + FIRST_GAP_EXTRA } : columnStyle}>
-      {/* Upper lane holds a box only when it points above the line */}
       <div style={{ ...laneStyle('up'), ...shiftStyle }}>
         {above && (
           <>
@@ -281,9 +252,6 @@ function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen, gapNode
         )}
       </div>
 
-      {/* Center spine: continuous line with a milestone point. The line spans
-          the full (widened) column so it stays continuous; only the point is
-          shifted back to its original position. */}
       <div style={spineStyle}>
         <TimelineLine
           asset={assets?.line?.segment}
@@ -311,7 +279,6 @@ function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen, gapNode
         </div>
       </div>
 
-      {/* Lower lane holds a box only when it points below the line */}
       <div style={{ ...laneStyle('down'), ...shiftStyle }}>
         {!above && (
           <>
@@ -324,15 +291,13 @@ function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen, gapNode
   )
 }
 
-// Line
-
 type LineProps = {
   asset?: string
   startCap?: string
   endCap?: string
   showStartCap: boolean
   showEndCap: boolean
-  /** Tile the segment across the widened first-column gap instead of stretching once. */
+  
   gapRepeats?: number
   gapWidth?: number
 }
@@ -429,8 +394,6 @@ function LineSegment({
   )
 }
 
-// Point
-
 function TimelinePoint({ asset }: { asset?: string }) {
   return (
     <div style={pointWrapStyle}>
@@ -442,8 +405,6 @@ function TimelinePoint({ asset }: { asset?: string }) {
     </div>
   )
 }
-
-// Connector (vertical stem between line and box)
 
 function TimelineConnector({
   asset,
@@ -467,8 +428,6 @@ function TimelineConnector({
     </div>
   )
 }
-
-// Box (artwork card)
 
 function TimelineBox({
   event,
@@ -519,10 +478,6 @@ function TimelineBox({
   )
 }
 
-// Styles
-
-// The scrollbar lives outside the scrolling element so it stays pinned while
-// content pans.
 const rootStyle: React.CSSProperties = {
   position: 'relative',
   width: '100%',
@@ -536,8 +491,6 @@ const scrollStyle: React.CSSProperties = {
   overflowY: 'hidden',
 }
 
-// The custom scrollbar replaces the native one, so hide the native bar (which
-// macOS hides until scrolling anyway, and which would otherwise double up).
 const scrollbarHideCss = `
   .${SCROLL_CLASS} { scrollbar-width: none; -ms-overflow-style: none; }
   .${SCROLL_CLASS}::-webkit-scrollbar { display: none; }
@@ -557,8 +510,6 @@ const scrollbarWrapStyle: React.CSSProperties = {
   transition: 'opacity 200ms ease',
 }
 
-// Single-image back line stretched across the full scrollbar width at half
-// strength for a subtle rail.
 const scrollbarTrackImageStyle: React.CSSProperties = {
   position: 'absolute',
   left: 0,
@@ -607,10 +558,6 @@ const scrollbarThumbPlaceholderStyle: React.CSSProperties = {
   backgroundColor: ACCENT,
 }
 
-// Stacks the timeline track and the credits line into one vertically-centered
-// column whose width is driven by the track, so both share a single horizontal
-// scroll region. The bottom padding reserves the strip the custom scrollbar
-// floats over, so the credits (the last row) land just above the bar.
 const contentStyle: React.CSSProperties = {
   minWidth: 'min-content',
   minHeight: '100%',
@@ -656,9 +603,6 @@ const columnStyle: React.CSSProperties = {
   alignItems: 'center',
 }
 
-// Each lane anchors its content to the spine (line) side and grows away from
-// it: upper boxes stack upward, lower boxes hang downward. This keeps boxes
-// from overflowing across the line even when the caption space is reserved.
 const laneStyle = (position: 'up' | 'down'): React.CSSProperties => ({
   height: LANE_HEIGHT,
   width: '100%',
@@ -677,8 +621,6 @@ const spineStyle: React.CSSProperties = {
   justifyContent: 'center',
 }
 
-// Decorative markers for the extra holes created when the first column's line
-// is tiled — same diamond as event points, but with no connector or artwork.
 const gapPointStyle = (tileIndex: number): React.CSSProperties => ({
   position: 'absolute',
   left: tileIndex * COLUMN_WIDTH + SEGMENT_HOLE_X,
@@ -687,9 +629,6 @@ const gapPointStyle = (tileIndex: number): React.CSSProperties => ({
   zIndex: 1,
 })
 
-// Hangs an artwork card below one of the decorative gap markers, mirroring the
-// connector + box layout of a normal "below the line" column. Anchored so its
-// connector starts at the spine and the card fills the lower lane.
 const gapNodeStyle = (gapIndex: number): React.CSSProperties => ({
   position: 'absolute',
   left: gapIndex * COLUMN_WIDTH + SEGMENT_HOLE_X,
@@ -701,8 +640,6 @@ const gapNodeStyle = (gapIndex: number): React.CSSProperties => ({
   alignItems: 'center',
   zIndex: 2,
 })
-
-// Line
 
 const lineWrapStyle: React.CSSProperties = {
   position: 'absolute',
@@ -744,13 +681,6 @@ const capImageStyle: React.CSSProperties = {
   width: 'auto',
 }
 
-// The start-cap art's nose tip (its visual "end", the point that should meet
-// the line) sits at ~92.2% of the image's own width rather than at its right
-// edge, because the source SVG carries a little empty margin past the tip.
-// Shifting left by that fraction of its own rendered width (a %, so it holds
-// regardless of the fixed 12px render height) lands the tip exactly on the
-// line's start instead of the image's left edge, so the head trails off to
-// the left of the line rather than overlapping it.
 const startCapTransform = 'translate(-92.24%, -50%)'
 
 const capPlaceholderStyle: React.CSSProperties = {
@@ -760,8 +690,6 @@ const capPlaceholderStyle: React.CSSProperties = {
   borderBottom: '5px solid transparent',
   borderLeft: `9px solid ${LINE_COLOR}`,
 }
-
-// Point
 
 const pointWrapStyle: React.CSSProperties = {
   position: 'relative',
@@ -787,8 +715,6 @@ const pointPlaceholderStyle: React.CSSProperties = {
   boxShadow: `0 0 0 4px rgba(196,211,255,0.15)`,
 }
 
-// Connector
-
 const connectorWrapStyle = (orientation: 'up' | 'down'): React.CSSProperties => ({
   width: 12,
   height: CONNECTOR_LENGTH,
@@ -805,9 +731,6 @@ const connectorImageStyle: React.CSSProperties = {
   height: '100%',
 }
 
-// The connector art is drawn for the top (up) case; flip it vertically for
-// the bottom (down) case so any asymmetric detail (taper, arrow, etc.) points
-// away from the spine on both sides instead of repeating the same direction.
 const connectorImageFlippedStyle: React.CSSProperties = {
   ...connectorImageStyle,
   transform: 'scaleY(-1)',
@@ -818,8 +741,6 @@ const connectorPlaceholderStyle: React.CSSProperties = {
   height: '100%',
   backgroundColor: LINE_COLOR,
 }
-
-// Box
 
 const boxStyle: React.CSSProperties = {
   position: 'relative',

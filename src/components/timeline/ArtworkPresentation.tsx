@@ -8,7 +8,7 @@ export type TimelineEvent = {
   imageSrc?: string
   imageAlt?: string
   description?: string
-  /** When set, clicking the artwork navigates to this in-app route instead of opening the lightbox. */
+  
   href?: string
 }
 
@@ -153,7 +153,7 @@ type FramedArtworkProps = {
   frameScale?: number
   imageStyle?: React.CSSProperties
   placeholderMinWidth?: number
-  /** When true, frame wrapper fills the parent height (horizontal timeline cards). */
+  
   fillHeight?: boolean
   loading?: 'lazy' | 'eager'
 }
@@ -297,8 +297,6 @@ export function ArtworkLightbox({
       aria-label={label}
     >
       <style>{lightboxKeyframes}</style>
-      {/* On mobile, let taps on the artwork bubble up so touching anywhere closes
-          the lightbox. On desktop, keep clicks on the artwork from closing it. */}
       <figure
         style={lightboxFigureStyle}
         onClick={isMobile ? undefined : (e) => e.stopPropagation()}
