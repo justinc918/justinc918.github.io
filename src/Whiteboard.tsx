@@ -40,7 +40,7 @@ export default function Whiteboard({ images }: Props) {
     const mouseY = e.clientY - rect.top
 
     setTransform(prev => {
-      const delta = e.deltaY < 0 ? 1.1 : 0.9
+      const delta = e.deltaY < 0 ? 1.05 : 0.95
       const nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, prev.scale * delta))
 
       const scaleRatio = nextScale / prev.scale
