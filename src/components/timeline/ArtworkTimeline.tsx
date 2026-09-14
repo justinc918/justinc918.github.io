@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   ACCENT,
   ArtworkLightbox,
@@ -25,6 +26,12 @@ type TimelineProps = {
   events: TimelineEvent[]
   assets?: TimelineAssets
   credits?: React.ReactNode
+  /**
+   * An extra artwork pinned to one of the decorative "empty" markers in the
+   * widened first-column gap. `gapIndex` selects which marker (1-based, left to
+   * right); the event typically carries an `href` so clicking it navigates.
+   */
+  gapNode?: { event: TimelineEvent; gapIndex: number }
 }
 
 const LINE_COLOR = '#ccd8ff'
@@ -53,7 +60,7 @@ const SCROLL_CLASS = 'artwork-timeline-scroll'
 
 // Timeline
 
-export default function ArtworkTimeline({ events, assets, credits }: TimelineProps) {
+export default function ArtworkTimeline({ events, assets, credits, gapNode }: TimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   // The event whose image is expanded into the fullscreen lightbox, or null.
   const [activeEvent, setActiveEvent] = useState<TimelineEvent | null>(null)
@@ -101,6 +108,7 @@ export default function ArtworkTimeline({ events, assets, credits }: TimelinePro
                   isLast={isLast}
                   assets={assets}
                   onOpen={setActiveEvent}
+                  gapNode={isFirst ? gapNode : undefined}
                 />
               )
             })}
@@ -249,9 +257,10 @@ type ColumnProps = {
   isLast: boolean
   assets?: TimelineAssets
   onOpen: (event: TimelineEvent) => void
+  gapNode?: { event: TimelineEvent; gapIndex: number }
 }
 
-function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen }: ColumnProps) {
+function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen, gapNode }: ColumnProps) {
   // The first column is widened by FIRST_GAP_EXTRA. Because its point and box
   // are centered, we shift them back left by half the extra width so the first
   // image keeps its original left offset and only the gap after it grows.
@@ -291,6 +300,12 @@ function TimelineColumn({ event, above, isFirst, isLast, assets, onOpen }: Colum
               <TimelinePoint asset={assets?.point?.marker} />
             </div>
           ))}
+        {isFirst && gapNode && (
+          <div style={gapNodeStyle(gapNode.gapIndex)}>
+            <TimelineConnector asset={assets?.line?.connector} orientation="down" />
+            <TimelineBox event={gapNode.event} box={assets?.box} onOpen={onOpen} />
+          </div>
+        )}
         <div style={shiftStyle}>
           <TimelinePoint asset={assets?.point?.marker} />
         </div>
@@ -464,16 +479,19 @@ function TimelineBox({
   box?: TimelineAssets['box']
   onOpen: (event: TimelineEvent) => void
 }) {
+  const navigate = useNavigate()
   const [hovered, setHovered] = useState(false)
-  const canOpen = Boolean(event.imageSrc)
+  const isLink = Boolean(event.href)
+  const interactive = isLink || Boolean(event.imageSrc)
 
   const handleOpen = () => {
-    if (canOpen) onOpen(event)
+    if (isLink) navigate(event.href!)
+    else if (event.imageSrc) onOpen(event)
   }
 
   return (
     <figure
-      style={canOpen ? { ...boxStyle, cursor: 'pointer' } : boxStyle}
+      style={interactive ? { ...boxStyle, cursor: 'pointer' } : boxStyle}
       aria-label={event.date ? `${event.title} — ${event.date}` : event.title}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -481,12 +499,12 @@ function TimelineBox({
       onBlur={() => setHovered(false)}
       onClick={handleOpen}
       onKeyDown={(e) => {
-        if (canOpen && (e.key === 'Enter' || e.key === ' ')) {
+        if (interactive && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault()
           handleOpen()
         }
       }}
-      role={canOpen ? 'button' : undefined}
+      role={interactive ? 'button' : undefined}
       tabIndex={0}
     >
       <figcaption style={boxCaptionStyle(hovered)}>
@@ -667,6 +685,21 @@ const gapPointStyle = (tileIndex: number): React.CSSProperties => ({
   top: '50%',
   transform: 'translate(-50%, -50%)',
   zIndex: 1,
+})
+
+// Hangs an artwork card below one of the decorative gap markers, mirroring the
+// connector + box layout of a normal "below the line" column. Anchored so its
+// connector starts at the spine and the card fills the lower lane.
+const gapNodeStyle = (gapIndex: number): React.CSSProperties => ({
+  position: 'absolute',
+  left: gapIndex * COLUMN_WIDTH + SEGMENT_HOLE_X,
+  top: '50%',
+  transform: 'translateX(-50%)',
+  paddingTop: POINT_SIZE / 2,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  zIndex: 2,
 })
 
 // Line

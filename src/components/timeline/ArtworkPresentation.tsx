@@ -8,6 +8,8 @@ export type TimelineEvent = {
   imageSrc?: string
   imageAlt?: string
   description?: string
+  /** When set, clicking the artwork navigates to this in-app route instead of opening the lightbox. */
+  href?: string
 }
 
 export type TimelineBoxBorder = {
