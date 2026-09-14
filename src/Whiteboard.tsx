@@ -84,7 +84,6 @@ export default function Whiteboard({ images = [], sections = [] }: Props) {
   }, [handleWheel])
 
   const onPointerDown = (e: React.PointerEvent) => {
-    if ((e.target as HTMLElement).closest('[data-card]')) return
     isPanning.current = true
     lastPointer.current = { x: e.clientX, y: e.clientY }
     containerRef.current?.setPointerCapture(e.pointerId)
