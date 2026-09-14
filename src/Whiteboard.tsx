@@ -5,6 +5,8 @@ interface ImageItem {
   src: string
   x: number
   y: number
+  width?: number
+  height?: number
 }
 
 interface SectionItem {
@@ -173,8 +175,8 @@ function ImageCard({ item }: { item: ImageItem }) {
         position: 'absolute',
         left: item.x,
         top: item.y,
-        width: CARD_WIDTH,
-        height: 'auto',
+        width: item.width ?? CARD_WIDTH,
+        height: item.height ?? 'auto',
         display: 'block',
       }}
     />
