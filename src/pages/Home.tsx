@@ -36,7 +36,7 @@ type LinkItem = {
 }
 
 const LINKS: LinkItem[] = [
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/justin-chen-79256432b/', Icon: LinkedInIcon },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/j--chen/', Icon: LinkedInIcon },
   { label: 'GitHub', href: 'https://github.com/justinc918', Icon: GitHubIcon },
   { label: 'Email', href: 'mailto:justinc918@g.ucla.edu', Icon: EmailIcon },
 ]
