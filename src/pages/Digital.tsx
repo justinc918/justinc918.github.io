@@ -8,7 +8,7 @@ const WHITEBOARD_NODE: TimelineEvent = {
   id: 'whiteboard',
   date: '',
   title: 'Whiteboard',
-  imageSrc: `${BASE}images/common/whiteboard.png`,
+  imageSrc: `${BASE}images/whiteboard/nightlord.webp`,
   imageAlt: 'Whiteboard',
   href: '/artwork/whiteboard',
 }
