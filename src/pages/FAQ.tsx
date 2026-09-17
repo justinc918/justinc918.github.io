@@ -13,11 +13,11 @@ const QA_ITEMS = [
   },
   {
     question: 'Is anything AI generated?',
-    answer: 'If we\'re talking the stuff I drew, I have not used AI to create anything under Artworks. I also hand-made all the assets used on this website in Illustrator.',
+    answer: 'If we\'re talking the stuff I drew, I have not used AI to create anything under Artworks. I also created all the assets used on this website in Illustrator.',
   },
   {
     question: 'Why did you upload art pieces you\'re not proud of?',
-    answer: 'More than anything, to demonstrate that everybody misfires, and that it\'s not rare. It also shows my progression, which I\'m especially proud of. I wasn\'t born with any artistic talent (trust me), and even if I was, I couldn\'t have made my favorite pieces without the ones that I felt disappointed in.',
+    answer: 'To demonstrate that everybody misfires, and that it\'s neither rare nor a big deal. It also shows my development, which I\'m rather proud of. I wasn\'t born with any artistic talent (trust me), and even if I was, I couldn\'t have made my favorite pieces without working through the ones that I felt disappointed in.',
   }
   ,
   {
