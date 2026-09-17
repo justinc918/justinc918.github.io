@@ -178,39 +178,60 @@ export default function Whiteboard({ images = [], sections = [] }: Props) {
         ))}
       </div>
 
-      <button
-        type="button"
-        aria-label="Reset view"
-        onPointerDown={e => e.stopPropagation()}
-        onClick={resetCamera}
+      <div
         style={{
-          ...resetButtonStyle,
-          left: RETURN_WIDTH * 0.55 * uiScale,
-          bottom: RETURN_WIDTH * 0.02 * uiScale,
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: RETURN_WIDTH * uiScale * 1.15,
+          height: RETURN_WIDTH * uiScale * 0.62,
+          zIndex: 100,
+          pointerEvents: 'none',
         }}
       >
-        <img
-          src={`${import.meta.env.BASE_URL}images/common/zoom.svg`}
-          alt=""
-          draggable={false}
-          style={{ display: 'block', width: 48 * uiScale, height: 48 * uiScale }}
-        />
-      </button>
-
-      <button
-        type="button"
-        aria-label="Back to artwork"
-        onPointerDown={e => e.stopPropagation()}
-        onClick={() => navigate('/artwork/digital')}
-        style={returnButtonStyle}
-      >
+        {/* Stretched painted navy corner used as the backing texture. */}
         <img
           src={`${import.meta.env.BASE_URL}images/common/whiteboard_return.png`}
           alt=""
           draggable={false}
-          style={{ display: 'block', width: RETURN_WIDTH * uiScale * 0.70, height: 'auto' }}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'block',
+          }}
         />
-      </button>
+        <button
+          type="button"
+          aria-label="Back to artwork"
+          onPointerDown={e => e.stopPropagation()}
+          onClick={() => navigate('/artwork/digital')}
+          style={{
+            ...cornerTextButtonStyle,
+            left: 22 * uiScale,
+            bottom: 20 * uiScale,
+            fontSize: 20 * uiScale,
+          }}
+        >
+          Back
+        </button>
+        <button
+          type="button"
+          aria-label="Reset view"
+          onPointerDown={e => e.stopPropagation()}
+          onClick={resetCamera}
+          style={{
+            ...cornerTextButtonStyle,
+            left: RETURN_WIDTH * uiScale * 0.5,
+            bottom: 20 * uiScale,
+            fontSize: 20 * uiScale,
+          }}
+        >
+          Reset
+        </button>
+      </div>
     </div>
   )
 }
@@ -286,30 +307,21 @@ function SectionGroup({ spec }: { spec: SectionSpec }) {
   )
 }
 
-const resetButtonStyle: React.CSSProperties = {
-  position: 'fixed',
+// Text buttons ("BACK" / "RESET") layered over the navy corner texture.
+// Uses the same color, font, spacing, and casing as the top navigation bar.
+const cornerTextButtonStyle: React.CSSProperties = {
+  position: 'absolute',
   background: 'none',
   border: 'none',
   padding: 0,
+  margin: 0,
   cursor: 'pointer',
+  pointerEvents: 'auto',
+  color: '#c4d3ff',
+  fontFamily: "'Libra Serif Modern', ui-serif, Georgia, 'Times New Roman', Times, serif",
+  letterSpacing: '0.03em',
+  textTransform: 'uppercase',
+  lineHeight: 1,
+  textShadow: '0 1px 3px rgba(0,0,0,0.45)',
   zIndex: 101,
-}
-
-// Clip the return button to its visible navy triangle so its click region
-// matches the artwork (the rest of the PNG is fully transparent). Percent-based
-// so it stays aligned at any scale. Traced from the image's opaque boundary.
-const RETURN_CLIP_PATH =
-  'polygon(0% 16%, 0% 100%, 81% 100%, 76% 90%, 72% 80%, 59% 70%, 48% 60%, 25% 50%, 17% 40%, 13% 30%, 7% 20%)'
-
-const returnButtonStyle: React.CSSProperties = {
-  position: 'fixed',
-  bottom: 0,
-  left: 0,
-  background: 'none',
-  border: 'none',
-  padding: 0,
-  display: 'block',
-  cursor: 'pointer',
-  clipPath: RETURN_CLIP_PATH,
-  zIndex: 100,
 }
