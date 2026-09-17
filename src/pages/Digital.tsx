@@ -6,7 +6,7 @@ const BASE = import.meta.env.BASE_URL
 
 const WHITEBOARD_NODE: TimelineEvent = {
   id: 'whiteboard',
-  date: '',
+  date: 'since October 2024',
   title: 'Whiteboard',
   imageSrc: `${BASE}images/whiteboard/nightlord.webp`,
   imageAlt: 'Whiteboard',
