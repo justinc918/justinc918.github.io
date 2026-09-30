@@ -8,6 +8,7 @@ const WHITEBOARD_NODE: TimelineEvent = {
   id: 'whiteboard',
   date: 'since October 2024',
   title: 'Whiteboard',
+  description: 'Click to view my full collection of whiteboard pieces.',
   imageSrc: `${BASE}images/whiteboard/nightlord.webp`,
   imageAlt: 'Whiteboard',
   href: '/artwork/whiteboard',
