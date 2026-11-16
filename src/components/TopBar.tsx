@@ -324,22 +324,32 @@ const logoLinkStyle: React.CSSProperties = {
   transform: 'translateY(-50%)',
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
+  width: 48,
+  height: 48,
   textDecoration: 'none',
-  zIndex: 1,
+  // Above the full-width nav so it doesn't swallow clicks on the logo
+  zIndex: 2,
 }
 
 const mobileLogoLinkStyle: React.CSSProperties = {
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
+  width: 48,
+  height: 48,
   textDecoration: 'none',
-  zIndex: 1,
+  zIndex: 2,
 }
 
 const logoStyle: React.CSSProperties = {
-  height: 32,
+  maxWidth: '100%',
+  maxHeight: 32,
   width: 'auto',
+  height: 'auto',
   display: 'block',
+  objectFit: 'contain',
 }
 
 const barStyle: React.CSSProperties = {
