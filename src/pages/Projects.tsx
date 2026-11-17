@@ -1,6 +1,7 @@
 const BASE = import.meta.env.BASE_URL
 const LONG_HORIZ = `${BASE}images/common/long_horiz.svg`
 const VIETCONG = `${BASE}images/other/vietcong.png`
+const PENUMBRA = `${BASE}images/other/darkmatter.png`
 
 const ICON_COLOR = '#c4d3ff'
 
@@ -36,7 +37,8 @@ type Project = {
 
 const PROJECTS: Project[] = [
   { title: 'Canary', description: 'Canary is a tool that lets users track their AI agent\'s development and roll back to previous versions in case of behavior issues. So in a nutshell, version control for agents. Made for LAHacks 2026. \\o to my teammates Rithvik, Arnav, and Bryan!', href: 'https://github.com/arnav0202006/Canary' },
-  { title: 'Argion', description: 'Argion is an all-in-one app for monitoring asteroids. Included are AI-driven classifications for asteroid severity and the best ways for astronomers to observe them, including locations and telescope settings. We also included some fun features like how you could theoretically travel to other planets by shooting off asteroids. Made for Berkeley AI Hackathon 2026. \\o to my teammates Arnav (a different one) and William!', href: 'https://github.com/justinc918/Argion' },
+  { title: 'Penumbra', description: 'Penumbra is our app for visualizing the dark matter in the universe and the physics behind it all. We used public data (KaRMMa, COSMOS 2007) to simulate the dark matter distribution in the universe and then visualize that data in the coolest way possible (our humble opinion). Deploy locally and run without an account. Made for Cal Hacks 13.0. \\o to my teammates Arnav (a different one) and Ethan!', href: 'https://github.com/aswaroop99/Penumbra', image: PENUMBRA },
+  { title: 'Argion', description: 'Argion is an all-in-one app for monitoring asteroids. Included are AI-driven classifications for asteroid severity and the best ways for astronomers to observe them, including locations and telescope settings. We also included some fun features like how you could theoretically travel to other planets by shooting off asteroids. Made for Berkeley AI Hackathon 2026. \\o to my teammates Arnav (Penumbra Arnav) and William!', href: 'https://github.com/justinc918/Argion' },
   { title: '35L Project', description: 'Our team project for the infamous UCLA CS 35L course. We built a website featuring two rather obscure card games. We support multiplayer, stats tracking, and match recording. Check it out, the site\'s still online: https://35-lproject.vercel.app. \\o to my teammates Tyler, Ethan, Prabhvir, and Tejas!', href: 'https://github.com/lordboba/35Lproject', liveHref: 'https://35-lproject.vercel.app/app/lobby', image: VIETCONG },
 ]
 
